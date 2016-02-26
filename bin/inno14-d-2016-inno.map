@@ -1287,21 +1287,21 @@ Discarded input sections
  .text          0x00000000        0x0 obj/Page_BB-d-2016-inno.o
  .data          0x00000000        0x0 obj/Page_BB-d-2016-inno.o
  .bss           0x00000000        0x0 obj/Page_BB-d-2016-inno.o
- .gnu.lto_.inline.1cc9430e
+ .gnu.lto_.inline.1cd9806b
                 0x00000000       0x24 obj/Page_BB-d-2016-inno.o
- .gnu.lto__ZN7RunMode10turningPIDEs.1cc9430e
+ .gnu.lto__ZN7RunMode10turningPIDEs.1cd9806b
                 0x00000000       0xb8 obj/Page_BB-d-2016-inno.o
- .gnu.lto__ZL20__gthread_key_deletei.1cc9430e
+ .gnu.lto__ZL20__gthread_key_deletei.1cd9806b
                 0x00000000      0x122 obj/Page_BB-d-2016-inno.o
- .gnu.lto__ZN7RunMode12adjust_imageEv.1cc9430e
+ .gnu.lto__ZN7RunMode12adjust_imageEv.1cd9806b
                 0x00000000       0x72 obj/Page_BB-d-2016-inno.o
- .gnu.lto_.symbol_nodes.1cc9430e
+ .gnu.lto_.symbol_nodes.1cd9806b
                 0x00000000       0x69 obj/Page_BB-d-2016-inno.o
- .gnu.lto_.refs.1cc9430e
+ .gnu.lto_.refs.1cd9806b
                 0x00000000       0x1c obj/Page_BB-d-2016-inno.o
- .gnu.lto_.decls.1cc9430e
+ .gnu.lto_.decls.1cd9806b
                 0x00000000     0x4bc6 obj/Page_BB-d-2016-inno.o
- .gnu.lto_.symtab.1cc9430e
+ .gnu.lto_.symtab.1cd9806b
                 0x00000000      0x11f obj/Page_BB-d-2016-inno.o
  .gnu.lto_.opts
                 0x00000000       0xd7 obj/Page_BB-d-2016-inno.o

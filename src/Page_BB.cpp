@@ -13,7 +13,6 @@ int16_t RunMode::turningPID (int16_t mid_line){
 	return 0;
 
 }
-
 void RunMode::adjust_image (){
 
 }
