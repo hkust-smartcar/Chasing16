@@ -12,7 +12,7 @@
 #include <libbase/k60/mcg.h>
 #include <libsc/ab_encoder.h>
 #include <libsc/trs_d05.h>
-#include <libsc/tsl1401cl.h>
+#include <libsc/k60/ov7725.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
@@ -23,6 +23,7 @@
 #include <libsc/lcd_typewriter.h>
 #include <libsc/tower_pro_mg995.h>
 #include <array>
+#include <cstring>
 #include <sstream>
 #include <functional>
 
@@ -72,8 +73,7 @@ public: // public means anyone can access it
 	// (important) in comment state as there's no CCD in our program
 */
 
-	void printCamGraph();
-	 /* not yet finish */
+	void printRawCamGraph(Uint x, Uint y);
 
 
 	void clearLcd (uint16_t);
@@ -124,6 +124,7 @@ public: // public means anyone can access it
 	/*--------------------------------get data from component below------------------------------------*/
 
 	int16_t otsu_threshold();
+	void get_raw_image(void);
 
 
 
@@ -158,26 +159,28 @@ public: // public means anyone can access it
 
 private: // on9 sin set private :)
 	//private means only member of it's only class can access it.
-
-
+	Byte data[600];
 
 protected: //protected seems professional
 	//protected means either member of it's only class or class inherited
 
-	libsc::Led* Led1;
-	libsc::Led* Led2;
-	libsc::Led* Led3;
-	libsc::Led* Led4;
-	libsc::AbEncoder* encoder;
-	libsc::TrsD05* servo;
-	libsc::AlternateMotor* motor;
-	libsc::Button* button1;
-	libsc::Button* button2;
-	libsc::Joystick* joystick;
-	libsc::St7735r* LCD;
-	libsc::LcdConsole* LCDconsole;
-	libsc::LcdTypewriter* LCDwriter;
-	libsc::SimpleBuzzer* buzzer;
+
+	libsc::Led* Led1=nullptr;
+	libsc::Led* Led2=nullptr;
+	libsc::Led* Led3=nullptr;
+	libsc::Led* Led4=nullptr;
+	libsc::AbEncoder* encoder=nullptr;
+	libsc::TrsD05* servo=nullptr;
+	libsc::AlternateMotor* motor=nullptr;
+	libsc::Button* button1=nullptr;
+	libsc::Button* button2=nullptr;
+	libsc::Joystick* joystick=nullptr;
+	libsc::St7735r* LCD=nullptr;
+	libsc::LcdConsole* LCDconsole=nullptr;
+	libsc::LcdTypewriter* LCDwriter=nullptr;
+	libsc::SimpleBuzzer* buzzer=nullptr;
+	libsc::k60::Ov7725* cam=nullptr;
+
 
 	//the above * means its a pointer.
 	// either  int* a;

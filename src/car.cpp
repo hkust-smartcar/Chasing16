@@ -6,13 +6,16 @@
  */
 #include "car.h"
 #include "config.h"
-
+#include <cstring>
+#include <memory>
 
 Car::Car(){
 	Led1 = new Led(GetLed1Config());
 	Led2 = new Led(GetLed2Config());
 	Led3 = new Led(GetLed3Config());
 	Led4 = new Led(GetLed4Config());
+	cam = new k60::Ov7725(GetCameraConfig());
+	cam->Start();
 	encoder = new AbEncoder(GetAbEncoderConfig());
 	servo = new TrsD05(GetServoConfig());
 	motor = new AlternateMotor(GetAltmotorConfig());
@@ -29,6 +32,7 @@ Car::Car(){
 	LcdConsole::Config LCDCConfig;
 	LCDCConfig.lcd = LCD;
 	LCDconsole = new LcdConsole(LCDCConfig);
+
 
 }
 	// for constructor, you can temporarily understand it as :
@@ -56,6 +60,8 @@ Car::~Car(){
 	delete buzzer ;
 	delete LCDwriter;
 	delete LCDconsole;
+	cam->Stop();
+	delete cam;
 
 }
 	// for destructor, you can understand as following
@@ -96,29 +102,11 @@ void Car::printvalue(int x,int y,int w,int h,std::string Result){
 	LCDwriter->WriteString(s);
 }
 
-/*
-void Car::printCCDGraph(uint16_t data[libsc::Tsl1401cl::kSensorW], uint16_t color){
-	for(int i = 0; i < CCD->kSensorW; i++){
-		CCDinLCD = data[i] * 80 / 256;
-		LCD->SetRegion(libsc::Lcd::Rect(i,160-(2*CCDinLCD),1,2));
-		LCD->FillColor(color);
-	}
+void Car::printRawCamGraph(Uint x, Uint y){//directly print Car's private 'data[600]' at(x,y)
+	LCD->SetRegion(Lcd::Rect(x,y,80,60));
+	LCD->FillBits(0,0xFFFF,data,80*60);
 }
-*/
 
-/*
-void Car::clearCCDGraph(uint16_t color){
-	for(int i = 0; i < CCD->kSensorW; i++){
-		CCDinLCD = CCDData[i] * 80 / 256;
-		LCD->SetRegion(libsc::Lcd::Rect(i,160-(2*CCDinLCD),1,2));
-		LCD->FillColor(color);
-	}
-}
-*/
-
-void Car::printCamGraph(){
-	//wait for implementation
-}
 
 void Car::printline(int16_t value ,uint16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(0,value * 160 / 255,128,1));

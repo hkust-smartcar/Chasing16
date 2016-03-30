@@ -15,12 +15,13 @@
 #include <libbase/k60/mcg.h>
 #include <libsc/ab_encoder.h>
 #include <libsc/trs_d05.h>
-#include <libsc/tsl1401cl.h>
+#include <libsc/k60/ov7725.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
 #include <libsc/alternate_motor.h>
+
 
 using namespace libsc;
 
@@ -110,6 +111,7 @@ Button::Config GetButton1Config()
 	Button1Config.is_use_pull_resistor = false;
 //	Button1Config.listener_trigger = Button::Config::Trigger::kDown;
 //	Button1Config.listener = &blinkLed;
+	//TODO add ISR for Button
 	return Button1Config;
 }
 
@@ -127,6 +129,12 @@ Joystick::Config GetJoystickConfig()
 	Joystick::Config JoystickConfig;
 	JoystickConfig.id = 0;
 	JoystickConfig.is_active_low = true;
+//	JoystickConfig.listener_triggers[static_cast<int>(Joystick::State::kDown)] =
+//			Joystick::Config::Trigger::kDown;
+//	JoystickConfig.listeners[static_cast<int>(Joystick::State::kDown)] =
+//						[&](const uint8_t)
+//				{};
+	//TODO add ISR for every joystick state
 	return JoystickConfig;
 }
 
@@ -144,3 +152,12 @@ SimpleBuzzer::Config GetBuzzerConfig()
 	return BuzzerConfig;
 }
 
+k60::Ov7725::Config GetCameraConfig(){
+	k60::Ov7725::Config camcfg;
+	camcfg.w=80;
+	camcfg.h=60;
+	camcfg.fps=k60::Ov7725::Config::Fps::kHigh;
+//	camcfg.contrast = 0x30;
+//	camcfg.brightness=0x00;
+	return camcfg;
+}

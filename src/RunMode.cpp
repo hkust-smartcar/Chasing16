@@ -43,7 +43,7 @@ void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 void RunMode::servo_control(int16_t degree){
 	if(degree > maxServoAngle ) degree = maxServoAngle;
 	if(degree < minServoAngle ) degree = minServoAngle;
-	ideal_servo_degree = degree + 900;
+	ideal_servo_degree = degree*10 + 900;
 	servo->SetDegree(ideal_servo_degree);
 }
 

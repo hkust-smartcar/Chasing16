@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include "pVarManager.h"
 #include "car.h"
+#include "RunMode.h"
 
 
 using namespace libsc;
@@ -65,6 +66,20 @@ int main(void)
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
+	RunMode Run;
+	while(1){
+	Run.servo_control(0);
+	System::DelayMs(500);
+	Run.servo_control(30);
+	System::DelayMs(500);
+	Run.servo_control(0);
+	System::DelayMs(500);
+	Run.servo_control(-30);
+	System::DelayMs(500);
+	Run.servo_control(-30);
+	}
+
+
 
 
 
