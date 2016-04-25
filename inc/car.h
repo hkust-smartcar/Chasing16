@@ -161,6 +161,7 @@ private: // on9 sin set private :)
 	//private means only member of it's only class can access it.
 	Byte data[600];
 
+
 protected: //protected seems professional
 	//protected means either member of it's only class or class inherited
 

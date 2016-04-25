@@ -23,10 +23,11 @@ using namespace libbase::k60;
 
 int main(void)
 {
+	RunMode Run;
 
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
-/*
+
 	//tune encoder here
 	//to uncomment this code, comment all pVarManager object
 	JyMcuBt106::Config config;
@@ -51,7 +52,7 @@ int main(void)
 	 if (motor_speed > 500) {	 Run.motor_control(0,true);while(1);}
 	 System::DelayMs(20);
  }
- */
+
 
 
 /*
@@ -66,7 +67,7 @@ int main(void)
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
-	RunMode Run;
+
 	while(1){
 	Run.servo_control(0);
 	System::DelayMs(500);
