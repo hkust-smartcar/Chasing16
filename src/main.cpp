@@ -60,7 +60,6 @@ int main(void)
 */
 
 
-
 /*
 	 to use pVarManager, you need to use Chrome to download the app by peter
 	 link:
@@ -77,7 +76,7 @@ int main(void)
 	Timer::TimerInt current_time = 0;
 	Timer::TimerInt past_time = 0, past_time2 = 0;
 	Run.clearLcd(0);
-
+	
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
