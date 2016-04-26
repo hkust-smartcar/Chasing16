@@ -7,7 +7,9 @@
 
 #pragma once
 #include "car.h"
-
+#include <array>
+#define WHITE 1
+#define BLACK 0
 class RunMode: public Car
 {
 	// tips for choosing datatype, dont use too large( it will slow down your program)
@@ -17,6 +19,7 @@ class RunMode: public Car
 	//or just google that if u are not sure
 public:
 	RunMode();
+	RunMode(uint8_t bluetoothMode);
 	~RunMode();
 
 	int16_t turningPID (int16_t mid_line);
@@ -33,7 +36,9 @@ public:
 
 	void adjust_image();	//correct the image
 
-	void extract_line();	//
+	std::array<std::array<bool,80>,60> getRawData(Byte cam_data);
+
+	void extract_line(Byte image[600]);	//
 
 	void identify_road();	//
 
@@ -48,6 +53,7 @@ public:
 
 	int16_t ideal_servo_degree, ideal_motor_speed;
 	int32_t encoder_count;
+
 
 
 private: //yes, I add these variable as private, because they are not important

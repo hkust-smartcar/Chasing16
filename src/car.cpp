@@ -18,7 +18,8 @@ Car::Car(){
 	cam->Start();
 	encoder = new AbEncoder(GetAbEncoderConfig());
 	servo = new TrsD05(GetServoConfig());
-	motor = new AlternateMotor(GetAltmotorConfig());
+//	motor = new AlternateMotor(GetAltmotorConfig());
+	motor = new DirMotor(GetDirmotorConfig());
 	button1 = new Button(GetButton1Config());
 	button2 = new Button(GetButton2Config());
 	joystick = new Joystick(GetJoystickConfig());
@@ -33,7 +34,8 @@ Car::Car(){
 	LCDCConfig.lcd = LCD;
 	LCDconsole = new LcdConsole(LCDCConfig);
 
-
+	/***********************************variable below**********************************/
+	image_size = cam->GetH() * cam->GetW() / 8;
 }
 	// for constructor, you can temporarily understand it as :
 	// initialize all variable ( & pointer)
@@ -107,6 +109,14 @@ void Car::printRawCamGraph(Uint x, Uint y){//directly print Car's private 'data[
 	LCD->FillBits(0,0xFFFF,data,80*60);
 }
 
+bool Car::updateCam(){
+	if (cam->IsAvailable()){
+		memcpy(data,cam->LockBuffer(),image_size);
+		cam->UnlockBuffer();
+		return true;
+	}
+	else return false;
+}
 
 void Car::printline(int16_t value ,uint16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(0,value * 160 / 255,128,1));
@@ -148,22 +158,20 @@ void Car::beepbuzzer(bool tobeep){
 }
 
 void Car::switchLED(int8_t id){
-	libsc::Led* LedToBlink;
 	switch(id){
 	case 1:
-		LedToBlink = Led1;
+		Led1->Switch();
 		break;
 	case 2:
-		LedToBlink = Led2;
+		Led2->Switch();
 		break;
 	case 3:
-		LedToBlink = Led3;
+		Led3->Switch();
 		break;
 	case 4:
-		LedToBlink = Led4;
+		Led4->Switch();
 		break;
 	}
-	LedToBlink->Switch();
 }
 
 bool Car::getbutton(int8_t id){

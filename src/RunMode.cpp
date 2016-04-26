@@ -14,12 +14,29 @@ RunMode::RunMode(){
 	ideal_servo_degree = 0;
 	ideal_motor_speed = 0;
 	encoder_count = 0;
+}
 
+RunMode::RunMode(uint8_t bluetoothMode){
+
+	maxMotorSpeed = 600;
+	minMotorSpeed = 0;
+	ideal_servo_degree = 0;
+	ideal_motor_speed = 0;
+	encoder_count = 0;
+
+	switch (bluetoothMode)
+	{
+	case 0:
+		break;
+	case 1:
+		break;
+	default:
+		break;
+	}
 
 }
 
 RunMode::~RunMode(){
-
 }
 
 
