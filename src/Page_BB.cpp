@@ -39,7 +39,7 @@ void RunMode::extract_line(Byte image[600]){
 	// z=80y +x
 
 
-/*
+
 	for (int j=0; j<60; j++){
 		if (j<=10){
 			for (int i =1; i<80; i++){
@@ -71,7 +71,7 @@ void RunMode::extract_line(Byte image[600]){
 			}
 		}
 
-	}*/
+	}
 }
 
 
