@@ -20,7 +20,6 @@
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
-//#include <libsc/alternate_motor.h>
 #include <libsc/dir_motor.h>
 
 using namespace libsc;
