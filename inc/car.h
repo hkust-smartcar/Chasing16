@@ -18,10 +18,9 @@
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
 #include <string>
-#include <libsc/alternate_motor.h>
+#include <libsc/dir_motor.h>
 #include <libsc/lcd_console.h>
 #include <libsc/lcd_typewriter.h>
-#include <libsc/tower_pro_mg995.h>
 #include <array>
 #include <cstring>
 #include <sstream>
@@ -75,6 +74,7 @@ public: // public means anyone can access it
 
 	void printRawCamGraph(Uint x, Uint y);
 
+	bool updateCam();
 
 	void clearLcd (uint16_t);
 	//clear the lcd the the given color
@@ -93,6 +93,7 @@ public: // public means anyone can access it
 
 	void blinkLED(int8_t id, int delay_time, int persist_time);
 	//blink LED
+	//time in ms
 	//Internal delay inside
 
 	void beepbuzzer(bool tobeep);
@@ -159,9 +160,8 @@ public: // public means anyone can access it
 
 private: // on9 sin set private :)
 	//private means only member of it's only class can access it.
-	Byte data[600];
-
-
+	Byte* data = new Byte[600];
+	int16_t image_size;
 protected: //protected seems professional
 	//protected means either member of it's only class or class inherited
 
@@ -172,7 +172,8 @@ protected: //protected seems professional
 	libsc::Led* Led4=nullptr;
 	libsc::AbEncoder* encoder=nullptr;
 	libsc::TrsD05* servo=nullptr;
-	libsc::AlternateMotor* motor=nullptr;
+//	libsc::AlternateMotor* motor=nullptr;
+	libsc::DirMotor* motor=nullptr;
 	libsc::Button* button1=nullptr;
 	libsc::Button* button2=nullptr;
 	libsc::Joystick* joystick=nullptr;
@@ -181,6 +182,7 @@ protected: //protected seems professional
 	libsc::LcdTypewriter* LCDwriter=nullptr;
 	libsc::SimpleBuzzer* buzzer=nullptr;
 	libsc::k60::Ov7725* cam=nullptr;
+
 
 
 	//the above * means its a pointer.

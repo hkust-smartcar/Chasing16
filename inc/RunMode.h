@@ -19,6 +19,7 @@ class RunMode: public Car
 	//or just google that if u are not sure
 public:
 	RunMode();
+	RunMode(uint8_t bluetoothMode);
 	~RunMode();
 
 	int16_t turningPID ();

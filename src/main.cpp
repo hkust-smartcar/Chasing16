@@ -20,21 +20,25 @@ using namespace libsc;
 using namespace libbase::k60;
 
 
-
 int main(void)
 {
+	System::Init();
 	RunMode Run;
+	Timer::TimerInt init_time;
+
+
+/*
 
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
 
 	//tune encoder here
 	//to uncomment this code, comment all pVarManager object
-	JyMcuBt106::Config config;
+	k60::JyMcuBt106::Config config;
 	config.id = 0;
 	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
-	config.rx_irq_threshold = 2;
-	JyMcuBt106 fuck(config);
+	config.tx_dma_channel = 4;
+	k60::JyMcuBt106 fuck(config);
 	char *PWM_buffer = new char[120]{0};
 	float encoder_counting = 0;
 	int motor_speed =0;
@@ -53,6 +57,7 @@ int main(void)
 	 System::DelayMs(20);
  }
 
+*/
 
 
 /*
@@ -63,26 +68,30 @@ int main(void)
 
 	//-------------------------------------your code below----------------------------------------//
 
-	System::Init();
+
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
-
+	Run.servo_control(0);
+	Timer::TimerInt current_time = 0;
+	Timer::TimerInt past_time = 0, past_time2 = 0;
+	Run.clearLcd(0);
+	
 	while(1){
-	Run.servo_control(0);
-	System::DelayMs(500);
-	Run.servo_control(30);
-	System::DelayMs(500);
-	Run.servo_control(0);
-	System::DelayMs(500);
-	Run.servo_control(-30);
-	System::DelayMs(500);
-	Run.servo_control(-30);
+		if(current_time !=System::Time()){
+			current_time = System::Time();
+
+			if((int32_t)(current_time - past_time) >= 20){
+				past_time = current_time;
+				Run.printRawCamGraph(0,0);
+				Run.updateCam();
+			}
+
+			if((int32_t)(current_time - past_time2) >= 20){
+				past_time2 = current_time;
+			}
+		}
 	}
-
-
-
-
 
 
 	return 0;

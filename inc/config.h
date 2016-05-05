@@ -20,8 +20,7 @@
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
-#include <libsc/alternate_motor.h>
-
+#include <libsc/dir_motor.h>
 
 using namespace libsc;
 
@@ -34,7 +33,7 @@ namespace libbase
 		{
 			Mcg::Config config;
 			config.external_oscillator_khz = 50000;
-			config.core_clock_khz = 200000;
+			config.core_clock_khz = 210000;
 			return config;
 		}
 
@@ -87,19 +86,18 @@ TrsD05::Config GetServoConfig()
 	return ServoConfig;
 }
 
-AlternateMotor::Config GetAltmotorConfig()
+//AlternateMotor::Config GetAltmotorConfig()
+//{
+//	AlternateMotor::Config AltmotorConfig;
+//	AltmotorConfig.id = 0;
+//	return AltmotorConfig;
+//}
+
+DirMotor::Config GetDirmotorConfig()
 {
-	AlternateMotor::Config AltmotorConfig;
-	AltmotorConfig.id = 0;
-	return AltmotorConfig;
-}
-
-
-
-uint8_t GetCcdConfig()
-{
-
-	return 0;
+	DirMotor::Config DirmotorConfig;
+	DirmotorConfig.id = 0;
+	return DirmotorConfig;
 }
 
 Button::Config GetButton1Config()
@@ -157,7 +155,7 @@ k60::Ov7725::Config GetCameraConfig(){
 	camcfg.w=80;
 	camcfg.h=60;
 	camcfg.fps=k60::Ov7725::Config::Fps::kHigh;
-//	camcfg.contrast = 0x30;
-//	camcfg.brightness=0x00;
+//	camcfg.contrast = 0x35;
+//	camcfg.brightness=0x35;
 	return camcfg;
 }
