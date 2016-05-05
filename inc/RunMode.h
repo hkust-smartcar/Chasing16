@@ -21,7 +21,7 @@ public:
 	RunMode();
 	~RunMode();
 
-	int16_t turningPID (int16_t mid_line);
+	int16_t turningPID ();
 	//PID = kp *error +kd *(error_prev - error) + ki * sum of error, in smartcar, ki can be neglected as its too small
 
 
@@ -37,7 +37,7 @@ public:
 
 	std::array<std::array<bool,80>,60> getRawData(Byte cam_data);
 
-	void extract_line(Byte image[600]);	//
+	void extract_line();	//
 
 	void identify_road();	//
 
@@ -52,7 +52,14 @@ public:
 
 	int16_t ideal_servo_degree, ideal_motor_speed;
 	int32_t encoder_count;
-
+	bool left_edge[60] = {false};
+	bool right_edge[60]= {false};
+	int16_t angle_error;
+	int16_t pre_angle_error;
+	int16_t servo_output;
+	uint32_t Kp_s;
+	uint32_t Kd_s;
+	bool image[4800]={false};
 
 
 private: //yes, I add these variable as private, because they are not important
