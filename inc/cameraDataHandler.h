@@ -1,5 +1,5 @@
 /*
- * cameraCalibration.h
+ * cameraDataHandler.h
  *
  *  Created on: 2016¦~5¤ë5¤é
  *      Author: yungc
@@ -12,6 +12,9 @@ class CamHandler{
 public:
 	CamHandler();
 	CamHandler(int16_t imageSize);
+
+	void camCorrection();
+
 
 
 
