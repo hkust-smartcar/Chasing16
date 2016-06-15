@@ -37,7 +37,7 @@ int main(void)
 	k60::JyMcuBt106::Config config;
 	config.id = 0;
 	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
-	config.tx_dma_channel = 4;
+	config.tx_dma_channel = -1;
 	k60::JyMcuBt106 fuck(config);
 	char *PWM_buffer = new char[120]{0};
 	float encoder_counting = 0;
@@ -80,7 +80,6 @@ int main(void)
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
-
 			if((int32_t)(current_time - past_time) >= 20){
 				past_time = current_time;
 				Run.printRawCamGraph(0,0);

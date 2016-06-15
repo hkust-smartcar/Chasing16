@@ -33,7 +33,7 @@ namespace libbase
 		{
 			Mcg::Config config;
 			config.external_oscillator_khz = 50000;
-			config.core_clock_khz = 210000;
+			config.core_clock_khz = 200000;
 			return config;
 		}
 
@@ -152,6 +152,7 @@ SimpleBuzzer::Config GetBuzzerConfig()
 
 k60::Ov7725::Config GetCameraConfig(){
 	k60::Ov7725::Config camcfg;
+	camcfg.id=0;
 	camcfg.w=80;
 	camcfg.h=60;
 	camcfg.fps=k60::Ov7725::Config::Fps::kHigh;
