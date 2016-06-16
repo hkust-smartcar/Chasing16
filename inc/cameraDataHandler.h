@@ -13,15 +13,26 @@
 class CamHandler{
 public:
 
+	enum Case{
+		TurnLeftWithoutProcess = 0,TurnRightWithoutProcess,StopCar,StraightRoute,LeftURoute,RightURoute,SFront,CrossRoute,NotInit
+	};
+	/* use method:
+	 * create CamHandler object
+	 * update updateRawData()
+	 * obtain Case by imageProcess()
+	 * depends on the case, if more information is needed, call those getXXXXX() function
+	 */
+	Case imageProcess();
+
 	CamHandler();
 
-	void covertBit();
-	void camCorrection();
-	void camCorrectionInit(int16_t x_size, int16_t y_size);
+	void convertBit();
+	void camCorrection();	//not ready
+	void camCorrectionInit(int16_t x_size, int16_t y_size);	//not ready
 	void extractBase();
 	void extractLeftLine(int16_t basePT);
 	void extractRightLine(int16_t basePT);
-
+	void lineProcess();
 
 
 	void updateRawData(Byte* rawData){RawData = rawData;}
@@ -44,26 +55,28 @@ private:
 	int8_t BWB_count = -1;	//illegal -1 imply not init, its the count of routes
 	int8_t WBW_count = -1;	//illegal -1 imply not init, its the count of diverse routes
 	int8_t shiftPT[80] ={0};
-
+	enum Shift{
+		left = 0,middle,right,ULeft,URight,Stop
+	};
+	Shift shift = middle;
 
 	/* extractLine */
 	int8_t leftLine[60]={0};
 	int8_t rightLine[60]={0};
 	enum LineType{
-		Straight = 0, UType, LType
+		Straight = 0, UType, LType, SType, CType, unknownType
 	};
-	LineType lineType = Straight;
-	enum Shift{
-		left = 0,middle,right,ULeft,URight
-	};
-	Shift shift = middle;
+	LineType LlineType = Straight;
+	LineType RlineType = Straight;
+	int16_t RbreakPT = -1;
+	int16_t LbreakPT = -1;
+	int8_t RangeOfSearchPT = 3;
 
-	struct pt{
-		int16_t actual_x = 65535;//65535 = not init
-		int16_t actual_y = 65535;//65535 = not init
-		//65535,65535 is end point
-	};
-	pt correctData[4800];
+	/* lineProcess */
+
+
+	Case routeCase = NotInit;
+
 	int16_t processSize = 0;
 
 };
