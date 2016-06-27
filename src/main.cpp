@@ -25,10 +25,9 @@ int main(void)
 	System::Init();
 	RunMode Run;
 	Timer::TimerInt init_time;
-
+	Timer::TimerInt persist_time;
 
 /*
-
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
 
@@ -37,7 +36,6 @@ int main(void)
 	k60::JyMcuBt106::Config config;
 	config.id = 0;
 	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
-	config.tx_dma_channel = -1;
 	k60::JyMcuBt106 fuck(config);
 	char *PWM_buffer = new char[120]{0};
 	float encoder_counting = 0;
@@ -57,6 +55,10 @@ int main(void)
 	 System::DelayMs(20);
  }
 
+	//28-6-2016
+	//y=30.136x-979.81, x=(y+979.81)/30.136 for x>56 and x->PWM, y->encoder count *(-1)
+	// thus , y=979.81-30.136x,  x= (979.81-y)/30.136
+	// this is for 30ms
 */
 
 
@@ -76,7 +78,7 @@ int main(void)
 	Timer::TimerInt current_time = 0;
 	Timer::TimerInt past_time = 0, past_time2 = 0;
 	Run.clearLcd(0);
-	
+
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
@@ -86,8 +88,10 @@ int main(void)
 				Run.updateCam();
 			}
 
-			if((int32_t)(current_time - past_time2) >= 20){
+			if((int32_t)(current_time - past_time2) >= 15){
 				past_time2 = current_time;
+
+
 			}
 		}
 	}

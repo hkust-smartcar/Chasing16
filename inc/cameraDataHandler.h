@@ -33,7 +33,7 @@ public:
 	void extractLeftLine(int16_t basePT);
 	void extractRightLine(int16_t basePT);
 	void lineProcess();
-
+	bool getBit(int16_t);
 
 	void updateRawData(Byte* rawData){RawData = rawData;}
 	Byte* getRawData(){return RawData;}
@@ -41,14 +41,19 @@ public:
 	int16_t getImageSize(){return ImageSize;}
 
 private:
+
 	int16_t ImageSize = 600;
 	Byte* RawData = nullptr;
+	Byte* intermediateByte = nullptr;
 	bool intermediate[4800];
 	int16_t k_size = 0;
 	int16_t k_rate = 0;
 	int8_t x_size = 0;
 	int8_t y_size = 0;
 
+	/* getBit */
+	int16_t target = -1;
+	int16_t offset = -1;
 	/* extractBase */
 	int16_t	leftX = -1;		//illegal -1 imply not init
 	int16_t rightY = -1;	//illegal -1 imply not init
@@ -64,7 +69,7 @@ private:
 	int8_t leftLine[60]={0};
 	int8_t rightLine[60]={0};
 	enum LineType{
-		Straight = 0, UType, LType, SType, CType, unknownType
+		Straight = 0, UType, LType, SType, CType, unknownType, full
 	};
 	LineType LlineType = Straight;
 	LineType RlineType = Straight;

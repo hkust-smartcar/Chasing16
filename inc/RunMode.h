@@ -52,6 +52,10 @@ public:
 	//to access the public variable, you can use (obj_name).(var_name) to access
 
 	int16_t ideal_servo_degree, ideal_motor_speed;
+	int16_t motor_speed_buff = 0;
+	int16_t motorspeed_error_prev = 0,motorspeed_error = 0,
+			motorspeed_error_sum = 0;
+	int16_t m_kp , m_ki, m_kd;
 	int32_t encoder_count;
 	bool left_edge[60] = {false};
 	bool right_edge[60]= {false};
@@ -65,8 +69,8 @@ public:
 
 private: //yes, I add these variable as private, because they are not important
 	// Moreover, variable can be declare in header(.h), and define in either header(.h) or source(.cpp)
-	int16_t maxServoAngle = 60;
-	int16_t minServoAngle = -60;		// give a maximun& minimun angle for servo to turn
+	int8_t maxServoAngle = 29;
+	int8_t minServoAngle = -29;		// give a maximun& minimun angle for servo to turn
 	int16_t maxMotorSpeed, minMotorSpeed; // give a maximun& minimun PWM for motor to run
 
 };

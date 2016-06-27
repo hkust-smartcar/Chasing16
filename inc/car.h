@@ -11,7 +11,7 @@
 #include <libsc/led.h>
 #include <libbase/k60/mcg.h>
 #include <libsc/ab_encoder.h>
-#include <libsc/trs_d05.h>
+#include <libsc/futaba_s3010.h>
 #include <libsc/k60/ov7725.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
@@ -28,7 +28,7 @@
 
 
 
-
+//
 
 class Car{
 public: // public means anyone can access it
@@ -50,27 +50,28 @@ public: // public means anyone can access it
 
 
 	/*--------------------------------printing below------------------------------------*/
-
-	void printvalue(int16_t value, int16_t color);
+/*	What color can be use:
+ * 	static constexpr uint16_t kBlack = 0x0000;
+	static constexpr uint16_t kGray = 0x7BEF;
+	static constexpr uint16_t kWhite = 0xFFFF;
+	static constexpr uint16_t kRed = 0xF800;
+	static constexpr uint16_t kYellow = 0xFFE0;
+	static constexpr uint16_t kGreen = 0x07E0;
+	static constexpr uint16_t kCyan = 0x07FF;
+	static constexpr uint16_t kBlue = 0x001F;
+	static constexpr uint16_t kPurple = 0xF81F;
+	*/
+	void printvalue(int16_t value, uint16_t color);
 	//print number to up-right corner in LCD
 
-	void printvalue(int x,int y,int w,int h,int16_t value, int16_t color);
+	void printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, int16_t color);
 	//print number to specific location, (x,y,w,h,value-to-print) respectively
 
 	void printvalue(std::string);
 	//print string to up-right corner in LCD
 
-	void printvalue(int x,int y,int w,int h,std::string Result);
+	void printvalue(int16_t x,int16_t y,int16_t w,int16_t h,std::string Result);
 	//print string to to specific location, (x,y,w,h,value-to-print) respectively
-
-
-/*
-	void printCCDGraph(uint16_t data[libsc::Tsl1401cl::kSensorW], uint16_t color);
-	void clearCCDGraph(uint16_t);
-	//mainly for clearing graph of CCD
-	//print graph inside tick
-	// (important) in comment state as there's no CCD in our program
-*/
 
 	void printRawCamGraph(Uint x, Uint y);
 
@@ -91,7 +92,7 @@ public: // public means anyone can access it
 
 	/*--------------------------------signal component below------------------------------------*/
 
-	void blinkLED(int8_t id, int delay_time, int persist_time);
+	void blinkLED(int8_t id, int32_t delay_time, int32_t persist_time);
 	//blink LED
 	//time in ms
 	//Internal delay inside
@@ -171,8 +172,7 @@ protected: //protected seems professional
 	libsc::Led* Led3=nullptr;
 	libsc::Led* Led4=nullptr;
 	libsc::AbEncoder* encoder=nullptr;
-	libsc::TrsD05* servo=nullptr;
-//	libsc::AlternateMotor* motor=nullptr;
+	libsc::FutabaS3010* servo=nullptr;
 	libsc::DirMotor* motor=nullptr;
 	libsc::Button* button1=nullptr;
 	libsc::Button* button2=nullptr;

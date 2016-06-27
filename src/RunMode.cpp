@@ -14,6 +14,9 @@ RunMode::RunMode(){
 	ideal_servo_degree = 0;
 	ideal_motor_speed = 0;
 	encoder_count = 0;
+	m_kp =  0;
+	m_ki = 0;
+	m_kd = 0;
 }
 
 RunMode::RunMode(uint8_t bluetoothMode){
@@ -41,11 +44,15 @@ RunMode::~RunMode(){
 
 
 int16_t RunMode::motorPID (int16_t ideal_encoder_count){
-
-	return 0;//your implementation
-	// tips, remember to add something to protect your motor, for example:
-	// e.g. 1) add a simple if-statement, if encoder count is near zero for 1~2s, stop the motor
-	// e.g. 2) if the car are sure its crazy, stop motor
+	motorspeed_error_prev = motorspeed_error;
+	motorspeed_error_sum += motorspeed_error;
+	motorspeed_error = ideal_encoder_count - encoder_count;
+	ideal_motor_speed = ideal_motor_speed + m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
+	//for 15 ms
+	ideal_motor_speed = (ideal_motor_speed) / 15-24;
+	if(encoder_count <=200 )return -1;
+	return ideal_motor_speed;
+	//check return, if always -1 then stop
 }
 
 void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
@@ -60,7 +67,7 @@ void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 void RunMode::servo_control(int16_t degree){
 	if(degree > maxServoAngle ) degree = maxServoAngle;
 	if(degree < minServoAngle ) degree = minServoAngle;
-	ideal_servo_degree = degree*10 + 900;
+	ideal_servo_degree = degree*10 + 992;
 	servo->SetDegree(ideal_servo_degree);
 }
 
@@ -69,6 +76,6 @@ void RunMode::update_encoder(){
 }
 
 int32_t RunMode::get_encoder_count(){
-	encoder_count = -1 * encoder->GetCount();
+	encoder_count = encoder->GetCount();
 	return encoder_count;
 }

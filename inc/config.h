@@ -14,13 +14,14 @@
 #include <libsc/led.h>
 #include <libbase/k60/mcg.h>
 #include <libsc/ab_encoder.h>
-#include <libsc/trs_d05.h>
+#include <libsc/futaba_s3010.h>
 #include <libsc/k60/ov7725.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
 #include <libsc/dir_motor.h>
+#include <libsc/k60/jy_mcu_bt_106.h>
 
 using namespace libsc;
 
@@ -79,9 +80,9 @@ AbEncoder::Config GetAbEncoderConfig()
 }
 
 //servo for turning
-TrsD05::Config GetServoConfig()
+FutabaS3010::Config GetServoConfig()
 {
-	TrsD05::Config ServoConfig;
+	FutabaS3010::Config ServoConfig;
 	ServoConfig.id = 0;
 	return ServoConfig;
 }

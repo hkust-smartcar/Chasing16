@@ -1,5 +1,5 @@
 /*
- * car.cpp
+  * car.cpp
  *
  *  Created on: 2016¦~1¤ë16¤é
  *      Author: yungc
@@ -17,7 +17,7 @@ Car::Car(){
 	cam = new k60::Ov7725(GetCameraConfig());
 	cam->Start();
 	encoder = new AbEncoder(GetAbEncoderConfig());
-	servo = new TrsD05(GetServoConfig());
+	servo = new FutabaS3010(GetServoConfig());
 //	motor = new AlternateMotor(GetAltmotorConfig());
 	motor = new DirMotor(GetDirmotorConfig());
 	button1 = new Button(GetButton1Config());
@@ -30,9 +30,10 @@ Car::Car(){
 	LcdWconfig.lcd = LCD;
 	LCDwriter = new LcdTypewriter(LcdWconfig);
 
-	LcdConsole::Config LCDCConfig;
-	LCDCConfig.lcd = LCD;
-	LCDconsole = new LcdConsole(LCDCConfig);
+//	LcdConsole::Config LCDCConfig;
+//	LCDCConfig.lcd = LCD;
+//	LCDconsole = new LcdConsole(LCDCConfig);
+	// LCDconsole will bring break point for unknown reason after line:new cellbuffer
 
 	/***********************************variable below**********************************/
 	image_size = cam->GetH() * cam->GetW() / 8;
@@ -70,7 +71,7 @@ Car::~Car(){
 	// "how many times you "new" a object in constructor, same amount of "delete" you need to put in destructor"
 	// if you "new" a object but dont "delete" it, the object will forever exist.( for more search "memory leak" )
 
-void Car::printvalue(int16_t value, int16_t color){
+void Car::printvalue(int16_t value, uint16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(0,0,128,40));
 	std::string Result;
 	std::ostringstream convert;
@@ -81,7 +82,7 @@ void Car::printvalue(int16_t value, int16_t color){
 	LCDwriter->WriteString(s);
 }
 
-void Car::printvalue(int x,int y,int w,int h,int16_t value, int16_t color){
+void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, int16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(x,y,w,h));
 	std::string Result;
 	std::ostringstream convert;
@@ -98,7 +99,7 @@ void Car::printvalue(std::string Result){
 	LCDwriter->WriteString(s);
 }
 
-void Car::printvalue(int x,int y,int w,int h,std::string Result){
+void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,std::string Result){
 	LCD->SetRegion(libsc::Lcd::Rect(x,y,w,h));
 	const char *s = Result.c_str();
 	LCDwriter->WriteString(s);
@@ -127,7 +128,7 @@ void Car::clearLcd (uint16_t color){
 	LCD->Clear(color);
 }
 
-void Car::blinkLED(int8_t id, int delay_time, int persist_time){
+void Car::blinkLED(int8_t id, int32_t delay_time, int32_t persist_time){
 	libsc::Led* LedToBlink;
 	switch(id){
 	case 1:

@@ -83,6 +83,14 @@ void CamHandler::extractBase(){
 
 }
 
+bool CamHandler::getBit(int16_t temp){
+	target = temp/8;
+	offset = temp%8;
+//	return (intermediateByte>>offset) %2;
+	return 0;
+
+}
+
 void CamHandler::convertBit(){
 	int curByte = 0;
 	for(int i = 0; i< ImageSize;i++){
@@ -217,6 +225,8 @@ void CamHandler::extractLeftLine(int16_t basePT){
 				return;
 			}
 		}
+			LlineType = full;
+
 	}
 
 void CamHandler::extractRightLine(int16_t basePT){
@@ -267,11 +277,14 @@ void CamHandler::extractRightLine(int16_t basePT){
 			return;
 		}
 	}
+	RlineType =	full;
 }
 
 void CamHandler::lineProcess(){
-	if(LlineType == unknownType && RlineType == unknownType){	// both side no white line
+	if(shift == middle){	// both side is expected to have lines
+		if(RlineType == unknownType && RlineType != unknownType){
 
+		}
 	}
 }
 
@@ -281,10 +294,13 @@ CamHandler::Case CamHandler::imageProcess(){
 	return routeCase;
 }
 
+
+
 /* given up for this: */
 void CamHandler::camCorrection(){
 
 }
+
 
 void CamHandler::camCorrectionInit(int16_t x_size,int16_t y_size){
 	for(int i = x_size/-2; i < x_size/2; i++){
