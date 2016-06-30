@@ -7,6 +7,7 @@
 #include "car.h"
 #include "RunMode.h"
 
+
 RunMode::RunMode(){
 	//can initialize the variable here,
 	maxMotorSpeed = 600;
@@ -78,4 +79,60 @@ void RunMode::update_encoder(){
 int32_t RunMode::get_encoder_count(){
 	encoder_count = encoder->GetCount();
 	return encoder_count;
+}
+
+void RunMode::print_case(CamHandler::Case routecase){
+//	enum Case{
+//			StopCar = 0,StraightRoute,SlightLeft,SlightRight,InLeftCurve,InRightCurve,
+//		SFront,CrossRoutetoLeft,CrossRoutetoRight,InComingLeftCurve,InComingRightCurve,
+//		InRightBigCurve,InLeftBigCurve,NotInit
+//	};
+	switch(routecase){
+	case 0:
+		printvalue("StopCar");
+		break;
+	case 1:
+		printvalue("StraightRoute");
+		break;
+	case 2:
+		printvalue("SlightLeft");
+		break;
+	case 3:
+		printvalue("SlightRight");
+		break;
+	case 4:
+		printvalue("InLeftCurve");
+		break;
+	case 5:
+		printvalue("InRightCurve");
+		break;
+	case 6:
+		printvalue("SFront");
+		break;
+	case 7:
+		printvalue("CrossRoutetoLeft");
+		break;
+	case 8:
+		printvalue("CrossRoutetoRight");
+		break;
+	case 9:
+		printvalue("InComingLeftCurve");
+		break;
+	case 10:
+		printvalue("InComingRightCurve");
+		break;
+	case 11:
+		printvalue("InRightBigCurve");
+		break;
+	case 12:
+		printvalue("InLeftBigCurve");
+		break;
+	case 13:
+		printvalue("NotInit");
+		break;
+	default:
+		printvalue("Can't recongize");
+
+
+	}
 }

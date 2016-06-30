@@ -6,7 +6,6 @@
  *      Author: yungc
  */
 #include  "libbase/misc_types.h"
-
 #pragma once
 
 
@@ -14,7 +13,9 @@ class CamHandler{
 public:
 
 	enum Case{
-		TurnLeftWithoutProcess = 0,TurnRightWithoutProcess,StopCar,StraightRoute,LeftURoute,RightURoute,SFront,CrossRoute,NotInit
+			StopCar = 0,StraightRoute,SlightLeft,SlightRight,InLeftCurve,InRightCurve,
+		SFront,CrossRoutetoLeft,CrossRoutetoRight,InComingLeftCurve,InComingRightCurve,
+		InRightBigCurve,InLeftBigCurve,NotInit
 	};
 	/* use method:
 	 * create CamHandler object
@@ -27,15 +28,17 @@ public:
 	CamHandler();
 
 	void convertBit();
+	bool getcertainBit(int16_t);
 	void camCorrection();	//not ready
 	void camCorrectionInit(int16_t x_size, int16_t y_size);	//not ready
 	void extractBase();
 	void extractLeftLine(int16_t basePT);
 	void extractRightLine(int16_t basePT);
 	void lineProcess();
-	bool getBit(int16_t);
 
-	void updateRawData(Byte* rawData){RawData = rawData;}
+	void filterBase3Line();
+
+	void updateRawData(Byte* rawData);
 	Byte* getRawData(){return RawData;}
 	void setImageSize(int16_t imageSize){ImageSize = imageSize;}
 	int16_t getImageSize(){return ImageSize;}
@@ -61,22 +64,23 @@ private:
 	int8_t WBW_count = -1;	//illegal -1 imply not init, its the count of diverse routes
 	int8_t shiftPT[80] ={0};
 	enum Shift{
-		left = 0,middle,right,ULeft,URight,Stop
+		left = 0,middle,right,ULeft,URight,CLeft,CRight,Stop
 	};
 	Shift shift = middle;
 
 	/* extractLine */
-	int8_t leftLine[60]={0};
-	int8_t rightLine[60]={0};
+	int8_t leftLine[57]={0};
+	int8_t rightLine[57]={0};
 	enum LineType{
-		Straight = 0, UType, LType, SType, CType, unknownType, full
+		Straight = 0, UType, LType, SType, CType, broken, full
 	};
 	LineType LlineType = Straight;
 	LineType RlineType = Straight;
 	int16_t RbreakPT = -1;
 	int16_t LbreakPT = -1;
-	int8_t RangeOfSearchPT = 3;
-
+	int8_t RangeOfSearchPT = 8;
+	int16_t RBasePT = -1, LBasePT = -1;
+	int16_t PrevRBasePT = -1, PrevLBasePT = -1;
 	/* lineProcess */
 
 
@@ -84,4 +88,13 @@ private:
 
 	int16_t processSize = 0;
 
+	/* line process*/
+	int16_t leftSum = 0, rightSum = 0;
+	int8_t leftZeroCount = 0, rightZeroCount = 0;
+	int8_t leftContactEdge = 0, rightContactEdge = 0;
+	int8_t leftVertex = 0, rightVertex = 0;
+	bool leftZeroContinue = true, rightZeroContinue = true;
+	bool leftDirection = true, rightDirection = true;
+	/* PID error */
+	int16_t SlightLeftError = -1, SlightRightError = -1;
 };

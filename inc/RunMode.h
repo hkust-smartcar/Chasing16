@@ -7,6 +7,7 @@
 
 #pragma once
 #include "car.h"
+#include "cameraDataHandler.h"
 #include <array>
 #define WHITE 1
 #define BLACK 0
@@ -36,6 +37,8 @@ public:
 
 	void adjust_image();	//correct the image
 
+	void print_case(CamHandler::Case routecase);
+
 	std::array<std::array<bool,80>,60> getRawData(Byte cam_data);
 
 	void extract_line();	//
@@ -57,8 +60,6 @@ public:
 			motorspeed_error_sum = 0;
 	int16_t m_kp , m_ki, m_kd;
 	int32_t encoder_count;
-	bool left_edge[60] = {false};
-	bool right_edge[60]= {false};
 	int16_t angle_error;
 	int16_t pre_angle_error;
 	int16_t servo_output;

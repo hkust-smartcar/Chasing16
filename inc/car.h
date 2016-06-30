@@ -126,7 +126,7 @@ public: // public means anyone can access it
 	/*--------------------------------get data from component below------------------------------------*/
 
 	int16_t otsu_threshold();
-	void get_raw_image(void);
+	Byte* get_raw_image();
 
 
 

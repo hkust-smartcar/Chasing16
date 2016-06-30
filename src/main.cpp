@@ -13,6 +13,7 @@
 #include "pVarManager.h"
 #include "car.h"
 #include "RunMode.h"
+#include "cameraDataHandler.h"
 
 
 using namespace libsc;
@@ -24,11 +25,12 @@ int main(void)
 {
 	System::Init();
 	RunMode Run;
+	CamHandler Image;
 	Timer::TimerInt init_time;
 	Timer::TimerInt persist_time;
 
-/*
-//code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
+
+/*//code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
 
 	//tune encoder here
@@ -59,10 +61,10 @@ int main(void)
 	//y=30.136x-979.81, x=(y+979.81)/30.136 for x>56 and x->PWM, y->encoder count *(-1)
 	// thus , y=979.81-30.136x,  x= (979.81-y)/30.136
 	// this is for 30ms
-*/
 
 
-/*
+
+
 	 to use pVarManager, you need to use Chrome to download the app by peter
 	 link:
 	 https://chrome.google.com/webstore/search/pgrapher?utm_source=chrome-ntp-icon
@@ -78,23 +80,24 @@ int main(void)
 	Timer::TimerInt current_time = 0;
 	Timer::TimerInt past_time = 0, past_time2 = 0;
 	Run.clearLcd(0);
-
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
 			if((int32_t)(current_time - past_time) >= 20){
 				past_time = current_time;
-				Run.printRawCamGraph(0,0);
+				Run.printRawCamGraph(0,40);
 				Run.updateCam();
+				Image.updateRawData(Run.get_raw_image());
+				Run.print_case(Image.imageProcess());
+				}
 			}
 
 			if((int32_t)(current_time - past_time2) >= 15){
 				past_time2 = current_time;
-
+				//motorPID
 
 			}
 		}
-	}
 
 
 	return 0;

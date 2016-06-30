@@ -119,6 +119,12 @@ bool Car::updateCam(){
 	else return false;
 }
 
+Byte* Car::get_raw_image(){
+	updateCam();
+	return data;
+
+}
+
 void Car::printline(int16_t value ,uint16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(0,value * 160 / 255,128,1));
 	LCD->FillColor(color);
