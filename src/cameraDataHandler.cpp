@@ -229,14 +229,14 @@ void CamHandler::extractLeftLine(int16_t basePT){
 			 * inner loop->loop for scanning connected white pixel */
 			//current is white
 			for(int j = 0; j < RangeOfSearchPT; j++){
-				if(!relativePT%80){//current at the bound of the image
+				if(relativePT%80 == 0){//current at the bound of the image
 					//white above white
-					leftLine[i] = 0;
+//					leftLine[i] = 0;
 					break;	// done for this row, go to the above row
 				}
 				else{
 					if(intermediate[relativePT-j] && !reachBound){
-						if(!(relativePT-j)%80){	// (relativePT -1) is another row
+						if((relativePT-j)%80 == 0){	// (relativePT -1) is another row
 							reachBound = true;
 						}
 						relativePT -= j;
@@ -292,7 +292,7 @@ void CamHandler::extractRightLine(int16_t basePT){
 	//basePT is the point which is White and going to turn Black
 	int16_t relativePT = basePT;	// the rightLine[i] will store distance from base point
 	bool reachBound;
-	rightLine[0] =0;
+	rightLine[0] = 0;
 	for(int i = 1; i<58;i++){
 		reachBound = false;
 		rightLine[i] = rightLine[i-1];
@@ -304,7 +304,7 @@ void CamHandler::extractRightLine(int16_t basePT){
 				if(((relativePT)%80) == 79){
 					//current at the bound of the image
 					//white above white
-					rightLine[i] = 0;
+//					rightLine[i] = 0;
 					break;	// done for this row, go to the above row
 				}
 				else{
@@ -353,15 +353,26 @@ void CamHandler::extractRightLine(int16_t basePT){
 }
 
 void CamHandler::lineProcess(){
+	//version 2, do all process then separate case
 	//init all variable
+	/* process left line first */
 	leftZeroContinue = true;
-	leftDirection = true;
+	leftDirectionInit = false;
 	leftSum = 0;
-	leftZeroCount = 0;
+	leftZeroCount = 1;
 	leftContactEdge = 0;
 	leftVertex = 0;
-	// process left line first
-	for(int i = 1; i < 58; i++){
+	leftVertexFirst = -1;
+	if(LlineType == broken)	leftLineEnd = LbreakPT+1;
+	else leftLineEnd = 58;
+
+	if(!(LBasePT %80))	leftStartFromEdge = true;
+	else leftStartFromEdge = false;
+
+	for(int i = 1; i < leftLineEnd; i++){
+		if(!((LBasePT-80*i+leftLine[i]) %80)){	// lies on the left edge
+			leftContactEdge++;
+		}
 		// filter those zero
 		if(!leftLine[i] && leftZeroContinue){
 			leftZeroCount++;
@@ -371,9 +382,154 @@ void CamHandler::lineProcess(){
 			leftZeroContinue = false;
 		}
 		//count the sum of the relative shift and find out the vertex, for vertex, it should turns more than 2 unit
-
-
+		leftSum += leftLine[i]; // add all shift
+		/* only once below */
+		if(!leftDirectionInit){	// init direction of turing
+			if(leftLine[i] > 0) leftDirection = true;
+			else leftDirection = false;
+			leftDirectionInit = true;
+			continue;
+		}
+		/* only once above */
+		if(leftLine[i] > 0 && leftDirection){	// positive shift toward right
+			if((leftLine[i] - leftLine[i-1]) < -1 || (leftLine[i] - leftLine[i-2]) < -1){	//curr - prev, if +ve, the shift continue, else vertex appear
+				leftDirection = false;
+				leftVertex ++;
+			}
+		}
+		else if(leftLine[i] > 0 && !leftDirection){	//positive shift toward left
+			if((leftLine[i] - leftLine[i-1]) > 1 || (leftLine[i] - leftLine[i-2]) > 1 ){
+				leftDirection = true;
+				leftVertex ++;
+			}
+		}
+		else if(leftLine[i] < 0 && !leftDirection){	//negative shift toward left
+			if((leftLine[i-1] - leftLine[i]) < -1 || (leftLine[i-2] - leftLine[i]) < -1){
+				leftDirection = true;
+				leftVertex ++;
+			}
+		}
+		else if(leftLine[i] < 0 && leftDirection){	//negative shift toward right
+			if((leftLine[i-1] - leftLine[i]) > 1 || (leftLine[i-2] - leftLine[i]) > 1){
+				leftDirection = false;
+				leftVertex ++;
+			}
+		}
+		if(leftVertex == 1 && leftVertexFirst == -1) {
+			leftVertexFirst = i;
+		}
 	}
+	leftRelativeSum = leftSum / (leftLineEnd-leftZeroCount);
+	leftZero = leftLineEnd - leftZeroCount;
+
+	/* process right line then */
+	rightZeroContinue = true;
+	rightDirectionInit = false;
+	rightSum = 0;
+	rightZeroCount = 1;
+	rightContactEdge = 0;
+	rightVertex = 0;
+	rightVertexFirst = -1;
+	if(RlineType == broken)	rightLineEnd = RbreakPT+1;
+	else rightLineEnd = 58;
+
+	if((RBasePT %80) == 79)	rightStartFromEdge = true;
+	else rightStartFromEdge = false;
+
+	for(int i = 1; i < rightLineEnd; i++){
+		if(!((RBasePT-80*i+rightLine[i]) %79)){	// lies on the left edge
+			rightContactEdge++;
+		}
+		// filter those zero
+		if(!rightLine[i] && rightZeroContinue){
+			rightZeroCount++;
+			continue;
+		}
+		else{
+			rightZeroContinue = false;
+		}
+		//count the sum of the relative shift and find out the vertex, for vertex, it should turns more than 2 unit
+		rightSum += rightLine[i]; // add all shift
+		/* only once below */
+		if(!rightDirectionInit){	// init direction of turing
+			if(rightLine[i] > 0) rightDirection = true;
+			else rightDirection = false;
+			rightDirectionInit = true;
+			continue;
+		}
+		/* only once above */
+		if(rightLine[i] > 0 && rightDirection){	// positive shift toward right
+			if((rightLine[i] - rightLine[i-1]) < -3 ||  (rightLine[i] - rightLine[i-2]) < -3){	//curr - prev, if +ve, the shift continue, else vertex appear
+				rightDirection = false;
+				rightVertex ++;
+			}
+		}
+		else if(rightLine[i] > 0 && !rightDirection){	//positive shift toward left
+			if((rightLine[i] - rightLine[i-1]) > 1 || (rightLine[i] - rightLine[i-2]) > 1){
+				rightDirection = true;
+				rightVertex ++;
+			}
+		}
+		else if(rightLine[i] < 0 && !rightDirection){	//negative shift toward left
+			if((rightLine[i-1] - rightLine[i]) < -1 || (rightLine[i-2] - rightLine[i]) < -1){
+				rightDirection = true;
+				rightVertex ++;
+			}
+		}
+		else if(rightLine[i] < 0 && rightDirection){	//negative shift toward right
+			if((rightLine[i-1] - rightLine[i]) > 1 || (rightLine[i-2] - rightLine[i]) > 1){
+				rightDirection = false;
+				rightVertex ++;
+			}
+		}
+		if(rightVertex == 1 && rightVertexFirst == -1) {
+			rightVertexFirst = i;
+		}
+	}
+	rightRelativeSum = rightSum / (rightLineEnd-rightZeroCount);
+	rightZero = rightLineEnd - rightZeroCount;
+
+	/* now return case */
+	if(shift == middle){
+		//special process for cross road
+		if((checkWhite() > 5 && (leftSum > rightSum ) && !rightStartFromEdge && leftStartFromEdge) ||
+				(rightStartFromEdge && leftStartFromEdge && checkLine(1) && checkLine(0) && (checkWhite() >4))){
+			routeCase = CrossRoute;
+			return;
+		}
+		if((leftVertex > 1 && rightVertex > 1 ) || (leftVertex > 1 && rightVertex > 1 ) ||
+				(leftVertex >2 && (rightZero < 5 && rightZero > -1))
+				|| (rightVertex > 2 && leftZero < 5 && leftZero > -1)){
+			routeCase = SFront;
+			return;
+		}
+		if((leftSum > rightSum && rightSum < 0 && (leftSum < 0 || (leftZero < 5 && leftZero > -1)) )
+				|| (rightSum < 0 && leftSum >0 && leftVertex > 0 && rightVertex < 1)){
+			routeCase = InLeftCurve;
+			if(leftZero < 5 && leftZero > -1)routeCase = InLeftBigCurve;
+			return;
+		}
+		if((leftSum > rightSum && leftSum > 0 && (rightSum > 0 || (rightZero < 5 && rightZero > -1)) )
+				||(rightSum < 0 && leftSum > 0 && rightVertex > 0 && leftVertex < 1)){
+			routeCase = InRightCurve;
+			if(rightZero < 5 && rightZero > -1)routeCase = InRightBigCurve;
+			return;
+		}
+		if(((rightRelativeSum + leftRelativeSum) < 5 ||(rightRelativeSum + leftRelativeSum) > -5)){
+			// future improvement to assure its a straight line
+			routeCase = StraightRoute;
+			return;
+		}
+	}
+	else if(shift == left || shift == CLeft){
+		routeCase = InLeftBigCurve;
+		return;
+	}
+	else if(shift == right || shift == CRight){
+		routeCase = InRightBigCurve;
+		return;
+	}
+	routeCase = CantRecognize;
 
 	/*//version 1, have unknown bug to fix
 	 * int16_t leftSum = 0, rightSum = 0;
@@ -477,6 +633,153 @@ void CamHandler::lineProcess(){
 
 		}
 	}*/
+}
+
+int8_t CamHandler::checkWhite(){
+	checkWhiteCounter = 0;
+	int8_t tempCounter = 0;
+	int8_t temp = 0;
+	for(int8_t j=0; j<60;j++){
+		for(int16_t i = 0;i<10 ;i++){
+			if(RawData[i+10*j] == 0){
+				tempCounter++;
+				if(tempCounter == 10) {
+					checkWhiteCounter++;
+					tempCounter = 0;
+					break;
+				}
+			}
+			else {
+				tempCounter = 0;
+				break;
+			}
+		}
+	}
+	return checkWhiteCounter;
+}
+
+bool CamHandler::checkLine(bool isLeft){
+	int16_t relativePTL = 4560;
+	int16_t relativePTR = 4639;
+	int8_t lineCounterL =0;
+	int8_t lineCounterR =0;
+
+	bool pointLocated = false;
+	bool lineExist = false;
+	if(isLeft){
+		for(int8_t i=0; i< 58 ;i++){
+			//4560 to 4639
+			relativePTL = 4560-80*i;
+			if(!intermediate[relativePTL]){
+				continue;
+			}
+			if(!pointLocated){
+				for(int8_t j = 0; j<40;j++){
+					if(!intermediate[relativePTL+j]){
+						relativePTL = relativePTL+j;
+						pointLocated =true;
+						break;
+					}
+				}
+				if(!pointLocated)return false; // no point exist
+				continue;
+			}
+			if(!intermediate[relativePTL]){
+				for(int8_t k = 1; k<=3;k++){
+					if(intermediate[relativePTL-k]){
+						relativePTL -= k+1;
+						lineCounterL++;
+						break;
+					}
+					if(intermediate[relativePTL+k]){
+						relativePTL += k-1;
+						lineCounterL++;
+						break;
+					}
+					if(k == 3 ){
+						if(lineCounterL >4) return true;
+						else return false;
+					}
+				}
+			}
+			else{
+				for(int8_t k = 1; k<=3;k++){
+					if(intermediate[relativePTL+k]){
+						relativePTL += k-1;
+						lineCounterL++;
+						break;
+					}
+					if(k == 3 ){
+						if(lineCounterL >4) return true;
+						else return false;
+					}
+				}
+			}
+		}
+		if(lineCounterL >4) return true;
+		else return false;
+	}
+	else if(!isLeft){
+		for(int8_t i=0; i< 58;i++){
+			//4560 to 4639
+			relativePTR = 4639-80*i;
+			if(!intermediate[relativePTR]){
+				continue;
+			}
+			if(!pointLocated){
+				for(int8_t j = 0; j<40;j++){
+					if(!intermediate[relativePTR+j]){
+						relativePTR = relativePTR+j;
+						pointLocated =true;
+						break;
+					}
+				}
+				if(!pointLocated)return false; // no point exist
+				continue;
+			}
+			if(!intermediate[relativePTR]){
+				for(int8_t k = 1; k<=3;k++){
+					if(intermediate[relativePTR-k]){
+						relativePTR -= k+1;
+						lineCounterR++;
+						break;
+					}
+					if(intermediate[relativePTR+k]){
+						relativePTR += k-1;
+						lineCounterR++;
+						break;
+					}
+					if(k == 3 ){
+						if(lineCounterR >4) return true;
+						else return false;
+					}
+				}
+			}
+			else{
+				for(int8_t k = 1; k<=3;k++){
+					if(intermediate[relativePTR+k]){
+						relativePTR += k-1;
+						lineCounterR++;
+						break;
+					}
+					if(k == 3 ){
+						if(lineCounterR >4) return true;
+						else return false;
+					}
+				}
+			}
+		}
+		if(lineCounterR >4) return true;
+		else return false;
+	}
+
+}
+
+int8_t CamHandler::getError(Case turnCase){
+	if(turnCase == StopCar){
+		return 40;
+	}
+
 }
 
 void CamHandler::updateRawData(Byte* rawData){

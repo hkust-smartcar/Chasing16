@@ -89,6 +89,7 @@ int main(void)
 				Run.updateCam();
 				Image.updateRawData(Run.get_raw_image());
 				Run.print_case(Image.imageProcess());
+
 				}
 			}
 

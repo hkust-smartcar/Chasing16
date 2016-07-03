@@ -14,8 +14,8 @@ public:
 
 	enum Case{
 			StopCar = 0,StraightRoute,SlightLeft,SlightRight,InLeftCurve,InRightCurve,
-		SFront,CrossRoutetoLeft,CrossRoutetoRight,InComingLeftCurve,InComingRightCurve,
-		InRightBigCurve,InLeftBigCurve,NotInit
+		SFront,CrossRoute,InComingLeftCurve,InComingRightCurve,
+		InRightBigCurve,InLeftBigCurve,NotInit,CantRecognize
 	};
 	/* use method:
 	 * create CamHandler object
@@ -35,16 +35,17 @@ public:
 	void extractLeftLine(int16_t basePT);
 	void extractRightLine(int16_t basePT);
 	void lineProcess();
-
+	int8_t checkWhite();
+	bool checkLine(bool isLeft);
 	void filterBase3Line();
-
+	int8_t getError(Case turnCase);
 	void updateRawData(Byte* rawData);
 	Byte* getRawData(){return RawData;}
 	void setImageSize(int16_t imageSize){ImageSize = imageSize;}
 	int16_t getImageSize(){return ImageSize;}
 
 private:
-
+	int8_t checkWhiteCounter = 0;
 	int16_t ImageSize = 600;
 	Byte* RawData = nullptr;
 	Byte* intermediateByte = nullptr;
@@ -81,6 +82,8 @@ private:
 	int8_t RangeOfSearchPT = 8;
 	int16_t RBasePT = -1, LBasePT = -1;
 	int16_t PrevRBasePT = -1, PrevLBasePT = -1;
+	bool LWhite = false, RWhite = false;
+
 	/* lineProcess */
 
 
@@ -95,6 +98,14 @@ private:
 	int8_t leftVertex = 0, rightVertex = 0;
 	bool leftZeroContinue = true, rightZeroContinue = true;
 	bool leftDirection = true, rightDirection = true;
+	bool leftDirectionInit = false, rightDirectionInit = false;
+	bool leftStartFromEdge = false, rightStartFromEdge = false;
+	int8_t leftLineEnd = -1, rightLineEnd = -1;
+	int8_t leftRelativeSum = -1, rightRelativeSum = -1;
+	int8_t leftZero = 0, rightZero = 0;
+	int8_t leftVertexFirst = -1, rightVertexFirst = -1;
 	/* PID error */
-	int16_t SlightLeftError = -1, SlightRightError = -1;
+	int8_t midLine = 40;
+	int8_t error = -1;
+
 };

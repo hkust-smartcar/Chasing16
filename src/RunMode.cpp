@@ -43,6 +43,9 @@ RunMode::RunMode(uint8_t bluetoothMode){
 RunMode::~RunMode(){
 }
 
+int16_t turningPID(){
+
+}
 
 int16_t RunMode::motorPID (int16_t ideal_encoder_count){
 	motorspeed_error_prev = motorspeed_error;
@@ -110,28 +113,28 @@ void RunMode::print_case(CamHandler::Case routecase){
 		printvalue("SFront");
 		break;
 	case 7:
-		printvalue("CrossRoutetoLeft");
+		printvalue("CrossRoute");
 		break;
 	case 8:
-		printvalue("CrossRoutetoRight");
-		break;
-	case 9:
 		printvalue("InComingLeftCurve");
 		break;
-	case 10:
+	case 9:
 		printvalue("InComingRightCurve");
 		break;
-	case 11:
+	case 10:
 		printvalue("InRightBigCurve");
 		break;
-	case 12:
+	case 11:
 		printvalue("InLeftBigCurve");
 		break;
-	case 13:
+	case 12:
 		printvalue("NotInit");
 		break;
+	case 13:
+		printvalue("CantRecognize");
+		break;
 	default:
-		printvalue("Can't recongize");
+		printvalue("unexpected value");
 
 
 	}

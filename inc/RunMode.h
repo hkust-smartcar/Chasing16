@@ -23,7 +23,7 @@ public:
 	RunMode(uint8_t bluetoothMode);
 	~RunMode();
 
-	int16_t turningPID ();
+	int16_t turningPID (CamHandler::Case );
 	//PID = kp *error +kd *(error_prev - error) + ki * sum of error, in smartcar, ki can be neglected as its too small
 
 
