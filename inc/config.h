@@ -142,7 +142,11 @@ St7735r::Config GetLcdConfig()
 	St7735r::Config LcdConfig;
 	return LcdConfig;
 }
-
+LcdTypewriter::Config GetLcdWriterConfig(libsc::St7735r* LCD){
+	LcdTypewriter::Config LcdWconfig;
+	LcdWconfig.lcd = LCD;
+	return LcdWconfig;
+}
 SimpleBuzzer::Config GetBuzzerConfig()
 {
 	SimpleBuzzer::Config BuzzerConfig;

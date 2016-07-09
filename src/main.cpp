@@ -13,9 +13,9 @@
 #include "car.h"
 #include "RunMode.h"
 #include "cameraDataHandler.h"
-#include "pVarManager.h"
+#include <libutil/pGrapher.h>
 using namespace libsc;
-
+using namespace libutil;
 using namespace libbase::k60;
 
 
@@ -24,7 +24,8 @@ int main(void)
 	System::Init();
 	RunMode Run;
 	CamHandler Image;
-	pVarManager Grapher;
+	pGrapher Grapher;
+	float s = 0.0f, k = 0.0f;
 	Timer::TimerInt init_time;
 	Timer::TimerInt persist_time;
 
@@ -73,20 +74,23 @@ int main(void)
 
 	//-------------------------------------your code below----------------------------------------//
 
-	k60::JyMcuBt106::Config config;
-	config.id = 1;
-	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
-	k60::JyMcuBt106 fuck(config);
-	char* buffer = new char[100]{0};
-	char haha[30];
-	int n;
-	Byte* RawData = nullptr;
+//	k60::JyMcuBt106::Config config;
+//	config.id = 1;
+//	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
+//	k60::JyMcuBt106 fuck(config);
+//	char* buffer = new char[100]{0};
+//	char haha[30];
+//	int n;
+//	Byte* RawData = nullptr;
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
-
+	float speed = 0.0f;
 	Grapher.addSharedVar(&Run.s_kp,"s_kp");
 	Grapher.addSharedVar(&Run.s_kd,"s_kd");
+	Grapher.addSharedVar(&speed,"speed");
+	float angle = 0.0f;
+	Grapher.addWatchedVar(&angle,"angle");
 
 
 
@@ -99,24 +103,27 @@ int main(void)
 			current_time = System::Time();
 			if((int32_t)(current_time - past_time) >= 15){
 				past_time = current_time;
-//				Run.printRawCamGraph(0,40);
+////				Run.printRawCamGraph(0,40);
 				Run.updateCam();
 				Image.updateRawData(Run.get_raw_image());
-//				Run.print_case(Image.imageProcess());
-//				sprintf(haha,"mid %d", Image.getMidPT());
-//				Run.printCar(haha,116);
-				Run.turningPID(Image.imageProcess(), Image.getMidPT());
+////				Run.print_case(Image.imageProcess());
+////				sprintf(haha,"mid %d", Image.getMidPT());
+////				Run.printCar(haha,116);
+				angle = Run.turningPID(Image.imageProcess(), Image.getMidPT());
+				Run.servo_control(angle);
 				}
 			}
 
-		if((int32_t)(current_time - past_time3) >= 100){
+		if((int32_t)(current_time - past_time3) >= 30){
 			past_time3 = current_time;
 			Grapher.sendWatchData();
 		}
 
-		if((int32_t)(current_time - past_time2) >= 20){
+		if((int32_t)(current_time - past_time2) >= 15){
 			past_time2 = current_time;
-			Run.motor_control(Run.motorPID(500),1);
+			Run.update_encoder();
+			Run.get_encoder_count();
+			Run.motor_control(Run.motorPID(speed),0);
 			//motorPID
 		}
 	}

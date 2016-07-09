@@ -169,21 +169,20 @@ protected: //protected seems professional
 	//protected means either member of it's only class or class inherited
 
 
-	libsc::Led* Led1=nullptr;
-	libsc::Led* Led2=nullptr;
-	libsc::Led* Led3=nullptr;
-	libsc::Led* Led4=nullptr;
-	libsc::AbEncoder* encoder=nullptr;
-	libsc::FutabaS3010* servo=nullptr;
-	libsc::DirMotor* motor=nullptr;
-	libsc::Button* button1=nullptr;
-	libsc::Button* button2=nullptr;
-	libsc::Joystick* joystick=nullptr;
-	libsc::St7735r* LCD=nullptr;
-	libsc::LcdConsole* LCDconsole=nullptr;
-	libsc::LcdTypewriter* LCDwriter=nullptr;
-	libsc::SimpleBuzzer* buzzer=nullptr;
-	libsc::k60::Ov7725* cam=nullptr;
+	libsc::Led Led1;
+	libsc::Led Led2;
+	libsc::Led Led3;
+	libsc::Led Led4;
+	libsc::AbEncoder encoder;
+	libsc::FutabaS3010 servo;
+	libsc::DirMotor motor;
+	libsc::Button button1;
+	libsc::Button button2;
+	libsc::Joystick joystick;
+	libsc::St7735r LCD;
+	libsc::LcdTypewriter LCDwriter;
+	libsc::SimpleBuzzer buzzer;
+	libsc::k60::Ov7725 cam;
 
 
 
