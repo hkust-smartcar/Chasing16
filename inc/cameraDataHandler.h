@@ -24,6 +24,8 @@ public:
 	 * depends on the case, if more information is needed, call those getXXXXX() function
 	 */
 	Case imageProcess();
+	Case getPreviousCase(){	return routeCase;}
+	int8_t getMidPT();
 
 	CamHandler();
 
@@ -38,13 +40,13 @@ public:
 	int8_t checkWhite();
 	bool checkLine(bool isLeft);
 	void filterBase3Line();
-	int8_t getError(Case turnCase);
 	void updateRawData(Byte* rawData);
 	Byte* getRawData(){return RawData;}
 	void setImageSize(int16_t imageSize){ImageSize = imageSize;}
 	int16_t getImageSize(){return ImageSize;}
 
 private:
+
 	int8_t checkWhiteCounter = 0;
 	int16_t ImageSize = 600;
 	Byte* RawData = nullptr;
@@ -65,7 +67,7 @@ private:
 	int8_t WBW_count = -1;	//illegal -1 imply not init, its the count of diverse routes
 	int8_t shiftPT[80] ={0};
 	enum Shift{
-		left = 0,middle,right,ULeft,URight,CLeft,CRight,Stop
+		left = 0,middle,right,ULeft,URight,CLeft,CRight,Stop,Unrecongize
 	};
 	Shift shift = middle;
 
@@ -85,10 +87,7 @@ private:
 	bool LWhite = false, RWhite = false;
 
 	/* lineProcess */
-
-
 	Case routeCase = NotInit;
-
 	int16_t processSize = 0;
 
 	/* line process*/
@@ -101,11 +100,19 @@ private:
 	bool leftDirectionInit = false, rightDirectionInit = false;
 	bool leftStartFromEdge = false, rightStartFromEdge = false;
 	int8_t leftLineEnd = -1, rightLineEnd = -1;
-	int8_t leftRelativeSum = -1, rightRelativeSum = -1;
+	int16_t leftRelativeSum = -1, rightRelativeSum = -1;
 	int8_t leftZero = 0, rightZero = 0;
 	int8_t leftVertexFirst = -1, rightVertexFirst = -1;
+	int16_t leftSumUntilVertex = 0, rightSumUntilVertex = 0;
+	int16_t leftSumUVright = 0, rightSumUVleft = 0;	// this is the count of relative shift for the other side base on the vertex of one side
+	int8_t leftVertexArr[30] = {0}, rightVertexArr[30] = {0};
 	/* PID error */
 	int8_t midLine = 40;
 	int8_t error = -1;
 
+	/* getMidPT */
+	int8_t leftRelativePT = 0;
+	int8_t rightRelativePT = 0;
+	float prevMidPT = 0.0f;
+	float midPT = 0.0f;
 };

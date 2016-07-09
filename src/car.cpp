@@ -8,6 +8,8 @@
 #include "config.h"
 #include <cstring>
 #include <memory>
+#include <sstream>
+#include <string>
 
 Car::Car(){
 	Led1 = new Led(GetLed1Config());
@@ -82,7 +84,7 @@ void Car::printvalue(int16_t value, uint16_t color){
 	LCDwriter->WriteString(s);
 }
 
-void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, int16_t color){
+void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, uint16_t color){
 	LCD->SetRegion(libsc::Lcd::Rect(x,y,w,h));
 	std::string Result;
 	std::ostringstream convert;
@@ -90,6 +92,12 @@ void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, int1
 	Result = convert.str();
 	const char *s = Result.c_str();
 	LCDwriter->SetTextColor(color);
+	LCDwriter->WriteString(s);
+}
+
+void Car::printCar(std::string Result, int8_t line){
+	LCD->SetRegion(libsc::Lcd::Rect(0,line,128,40));
+	const char *s = Result.c_str();
 	LCDwriter->WriteString(s);
 }
 

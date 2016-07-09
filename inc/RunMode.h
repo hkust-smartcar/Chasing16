@@ -20,10 +20,9 @@ class RunMode: public Car
 	//or just google that if u are not sure
 public:
 	RunMode();
-	RunMode(uint8_t bluetoothMode);
 	~RunMode();
 
-	int16_t turningPID (CamHandler::Case );
+	int16_t turningPID (CamHandler::Case ,int8_t routeMidP);
 	//PID = kp *error +kd *(error_prev - error) + ki * sum of error, in smartcar, ki can be neglected as its too small
 
 
@@ -58,13 +57,11 @@ public:
 	int16_t motor_speed_buff = 0;
 	int16_t motorspeed_error_prev = 0,motorspeed_error = 0,
 			motorspeed_error_sum = 0;
-	int16_t m_kp , m_ki, m_kd;
+	float m_kp, m_ki, m_kd;
 	int32_t encoder_count;
-	int16_t angle_error;
+	int16_t angle_error , angle_error_sum ;
 	int16_t pre_angle_error;
-	int16_t servo_output;
-	uint32_t Kp_s;
-	uint32_t Kd_s;
+	float s_kp,s_kd, s_ki;
 	bool image[4800]={false};
 
 

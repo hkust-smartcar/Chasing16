@@ -64,7 +64,7 @@ public: // public means anyone can access it
 	void printvalue(int16_t value, uint16_t color);
 	//print number to up-right corner in LCD
 
-	void printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, int16_t color);
+	void printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, uint16_t color);
 	//print number to specific location, (x,y,w,h,value-to-print) respectively
 
 	void printvalue(std::string);
@@ -84,6 +84,8 @@ public: // public means anyone can access it
 	void printline(int16_t value,uint16_t color);
 	// print a horizontal line, could be for threshold
 
+
+	void printCar(std::string, int8_t);
 	/*--------------------------------printing above------------------------------------*/
 
 

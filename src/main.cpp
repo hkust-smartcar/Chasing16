@@ -10,12 +10,10 @@
 #include <cstring>
 #include <libsc/system.h>
 #include <stdint.h>
-#include "pVarManager.h"
 #include "car.h"
 #include "RunMode.h"
 #include "cameraDataHandler.h"
-
-
+#include "pVarManager.h"
 using namespace libsc;
 
 using namespace libbase::k60;
@@ -26,15 +24,17 @@ int main(void)
 	System::Init();
 	RunMode Run;
 	CamHandler Image;
+	pVarManager Grapher;
 	Timer::TimerInt init_time;
 	Timer::TimerInt persist_time;
 
 
-/*//code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
+//code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
 
 	//tune encoder here
 	//to uncomment this code, comment all pVarManager object
+/*
 	k60::JyMcuBt106::Config config;
 	config.id = 0;
 	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
@@ -56,6 +56,7 @@ int main(void)
 	 if (motor_speed > 500) {	 Run.motor_control(0,true);while(1);}
 	 System::DelayMs(20);
  }
+*/
 
 	//28-6-2016
 	//y=30.136x-979.81, x=(y+979.81)/30.136 for x>56 and x->PWM, y->encoder count *(-1)
@@ -64,7 +65,7 @@ int main(void)
 
 
 
-
+/*
 	 to use pVarManager, you need to use Chrome to download the app by peter
 	 link:
 	 https://chrome.google.com/webstore/search/pgrapher?utm_source=chrome-ntp-icon
@@ -72,33 +73,53 @@ int main(void)
 
 	//-------------------------------------your code below----------------------------------------//
 
-
+	k60::JyMcuBt106::Config config;
+	config.id = 1;
+	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
+	k60::JyMcuBt106 fuck(config);
+	char* buffer = new char[100]{0};
+	char haha[30];
+	int n;
+	Byte* RawData = nullptr;
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
+
+	Grapher.addSharedVar(&Run.s_kp,"s_kp");
+	Grapher.addSharedVar(&Run.s_kd,"s_kd");
+
+
+
 	Run.servo_control(0);
 	Timer::TimerInt current_time = 0;
-	Timer::TimerInt past_time = 0, past_time2 = 0;
+	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0;
 	Run.clearLcd(0);
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
-			if((int32_t)(current_time - past_time) >= 20){
+			if((int32_t)(current_time - past_time) >= 15){
 				past_time = current_time;
-				Run.printRawCamGraph(0,40);
+//				Run.printRawCamGraph(0,40);
 				Run.updateCam();
 				Image.updateRawData(Run.get_raw_image());
-				Run.print_case(Image.imageProcess());
-
+//				Run.print_case(Image.imageProcess());
+//				sprintf(haha,"mid %d", Image.getMidPT());
+//				Run.printCar(haha,116);
+				Run.turningPID(Image.imageProcess(), Image.getMidPT());
 				}
 			}
 
-			if((int32_t)(current_time - past_time2) >= 15){
-				past_time2 = current_time;
-				//motorPID
-
-			}
+		if((int32_t)(current_time - past_time3) >= 100){
+			past_time3 = current_time;
+			Grapher.sendWatchData();
 		}
+
+		if((int32_t)(current_time - past_time2) >= 20){
+			past_time2 = current_time;
+			Run.motor_control(Run.motorPID(500),1);
+			//motorPID
+		}
+	}
 
 
 	return 0;

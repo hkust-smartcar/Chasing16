@@ -7,44 +7,41 @@
 #include "car.h"
 #include "RunMode.h"
 
-
 RunMode::RunMode(){
 	//can initialize the variable here,
+	// motor
 	maxMotorSpeed = 600;
 	minMotorSpeed = 0;
-	ideal_servo_degree = 0;
 	ideal_motor_speed = 0;
 	encoder_count = 0;
-	m_kp =  0;
+	m_kp =  1;
 	m_ki = 0;
 	m_kd = 0;
-}
 
-RunMode::RunMode(uint8_t bluetoothMode){
-
-	maxMotorSpeed = 600;
-	minMotorSpeed = 0;
+	//servo
 	ideal_servo_degree = 0;
-	ideal_motor_speed = 0;
-	encoder_count = 0;
-
-	switch (bluetoothMode)
-	{
-	case 0:
-		break;
-	case 1:
-		break;
-	default:
-		break;
-	}
-
+	angle_error = 0;
+	angle_error_sum = 0;
+	pre_angle_error = 0;
+	s_kp =  1;
+	s_ki = 0;
+	s_kd = 0;
 }
+
 
 RunMode::~RunMode(){
+
 }
 
-int16_t turningPID(){
-
+int16_t RunMode::turningPID(CamHandler::Case routeCase ,int8_t routeMidP){
+//	if(routeCase == CamHandler::CrossRoute){
+//
+//	}
+	pre_angle_error = angle_error;
+	angle_error_sum += angle_error;
+	angle_error = routeMidP - 40;
+	ideal_servo_degree = s_kp*angle_error + s_ki*angle_error_sum +  s_kd*(pre_angle_error - angle_error);
+	return ideal_servo_degree;
 }
 
 int16_t RunMode::motorPID (int16_t ideal_encoder_count){
