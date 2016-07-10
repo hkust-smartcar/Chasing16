@@ -25,7 +25,8 @@
 #include <cstring>
 #include <sstream>
 #include <functional>
-
+#include <libsc/us_100.h>
+#include <libsc/k60/jy_mcu_bt_106.h>
 
 
 //
@@ -36,6 +37,7 @@ public: // public means anyone can access it
 	// if you wanna do that, just search " class friend c++"
 
 	Car();
+	Car(libsc::k60::JyMcuBt106::Config ,bool isHC06);
 	// default constructor, it will be automatically called once the class object is created
 	// example : Car D7689;
 	// once the compiler run this code, Car() will be immediately called.
@@ -163,12 +165,14 @@ public: // public means anyone can access it
 
 private: // on9 sin set private :)
 	//private means only member of it's only class can access it.
-	Byte* data = new Byte[600];
+	Byte data[600];
 	int16_t image_size;
+	libsc::k60::JyMcuBt106::Config Bluetooth;
 protected: //protected seems professional
 	//protected means either member of it's only class or class inherited
-
-
+	libsc::k60::JyMcuBt106* hc06 = nullptr;
+	libsc::k60::JyMcuBt106* hc12 = nullptr;
+	libsc::Us100 USsensor;
 	libsc::Led Led1;
 	libsc::Led Led2;
 	libsc::Led Led3;
@@ -183,6 +187,7 @@ protected: //protected seems professional
 	libsc::LcdTypewriter LCDwriter;
 	libsc::SimpleBuzzer buzzer;
 	libsc::k60::Ov7725 cam;
+
 
 
 

@@ -473,7 +473,7 @@ void CamHandler::lineProcess(){
 	else rightStartFromEdge = false;
 
 	for(int i = 1; i < rightLineEnd; i++){
-		if(!((RBasePT-80*i+rightLine[i]) %79)){	// lies on the left edge
+		if(!((RBasePT-80*i+rightLine[i])%80 == 79)){	// lies on the left edge
 			rightContactEdge++;
 		}
 		// filter those zero
@@ -569,11 +569,12 @@ void CamHandler::lineProcess(){
 		if((checkWhite() > 5 && (leftSum > rightSum ) && (rightStartFromEdge || leftStartFromEdge)) ||
 				(rightStartFromEdge && leftStartFromEdge && checkLine(1) && checkLine(0) && (checkWhite() >4))){
 			if((leftVertex <2 && rightVertex <1) ||(leftVertex <1 && rightVertex <2)){
-				if(leftSum > -20 && leftSum <20 && rightSum < -550) {
+
+				if(rightSum < -350) {
 					routeCase = InLeftBigCurve;
 					return;
 				}
-				if(rightSum > -20 && rightSum <20 && leftSum > 550) {
+				if( leftSum > 350) {
 					routeCase = InRightBigCurve;
 					return;
 				}
@@ -584,14 +585,14 @@ void CamHandler::lineProcess(){
 
 		}
 
-		if((leftSum > rightSum && rightSum <= 0 && (leftSum < 0 || (leftZero < 5 && leftZero > -1)) )
-				|| (rightSum <= 0 && leftSum >0 && leftVertex > 0 && rightVertex < 1)){
+		if((leftSum > rightSum && rightSum < 0 && (leftSum < 0 || (leftZero < 5 && leftZero > -1)) )
+				|| (rightSum < 0 && leftSum >0 && leftVertex > 0 && rightVertex < 1)){
 			routeCase = InLeftCurve;
 			if(leftZero < 5 && leftZero > -1)routeCase = InLeftBigCurve;
 			return;
 		}
 		if((leftSum > rightSum && leftSum > 0 && (rightSum > 0 || (rightZero < 5 && rightZero > -1)) )
-				||(rightSum <= 0 && leftSum > 0 && rightVertex > 0 && leftVertex < 1)){
+				||(rightSum < 0 && leftSum > 0 && rightVertex > 0 && leftVertex < 1)){
 			routeCase = InRightCurve;
 			if(rightZero < 5 && rightZero > -1)routeCase = InRightBigCurve;
 			return;
@@ -769,16 +770,16 @@ int8_t CamHandler::getMidPT(){
 	int16_t temp = -20, counter = 0, temp1 = 20;
 	prevMidPT = midPT;
 		if(routeCase == StraightRoute){
-			leftRelativePT = LBasePT%80;
-			rightRelativePT = RBasePT%80;
+			leftRelativePT = LBasePT%80 + leftLine[2];
+			rightRelativePT = RBasePT%80 + + rightLine[2];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == InLeftCurve || routeCase == InRightCurve){
-			leftRelativePT = LBasePT%80 + leftLine[10];
-			rightRelativePT = RBasePT%80 + rightLine[10];
+			leftRelativePT = LBasePT%80 + leftLine[22];
+			rightRelativePT = RBasePT%80 + rightLine[22];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == InLeftBigCurve || routeCase == InRightBigCurve){
-			leftRelativePT = LBasePT%80;
-			rightRelativePT = RBasePT%80;
+			leftRelativePT = LBasePT%80+ leftLine[22];
+			rightRelativePT = RBasePT%80+ rightLine[22];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == SFront){
 			if(leftVertexFirst != -1 && rightVertexFirst != -1){
@@ -802,16 +803,16 @@ int8_t CamHandler::getMidPT(){
 					midPT = (leftRelativePT + rightRelativePT)/2;
 				}
 				else{
-					leftRelativePT = LBasePT%80 + leftLine[5];
-					rightRelativePT = RBasePT%80 + rightLine[5];
+					leftRelativePT = LBasePT%80 + leftLine[8];
+					rightRelativePT = RBasePT%80 + rightLine[8];
 					midPT = (leftRelativePT + rightRelativePT)/2;
 				}
 			}
 
 		}
 		else if(routeCase == CrossRoute ){
-			leftRelativePT = LBasePT%80;
-			rightRelativePT = RBasePT%80;
+			leftRelativePT = LBasePT%80+ leftLine[20];
+			rightRelativePT = RBasePT%80+ rightLine[20];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}
 		else{

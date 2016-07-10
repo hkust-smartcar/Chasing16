@@ -10,12 +10,14 @@
 RunMode::RunMode(){
 	//can initialize the variable here,
 	// motor
-	maxMotorSpeed = 600;
+
+	maxMotorSpeed = 850;
 	minMotorSpeed = 0;
 	ideal_motor_speed = 0;
+	PID_Output = 0;
 	encoder_count = 0;
-	m_kp =  1;
-	m_ki = 0;
+	m_kp = 0.103;
+	m_ki = 0.033;
 	m_kd = 0;
 
 	//servo
@@ -23,9 +25,22 @@ RunMode::RunMode(){
 	angle_error = 0;
 	angle_error_sum = 0;
 	pre_angle_error = 0;
-	s_kp =  1;
-	s_ki = 0;
-	s_kd = 0;
+	s_kpBCurve = 18.5;
+	s_kdBCurve = 0;
+	s_kpBCurveR = 10.6;
+	s_kdBCurveR = 0;
+	s_kpSCurve = 15;
+	s_kdSCurve = 1.5;
+	s_kpSCurveR = 18;
+	s_kdSCurveR= 1.5;
+	s_kpSRoute = 18;
+	s_kdSRoute = 2;
+	s_kpStraight = 8;
+	s_kdStraight = 1;
+	s_kpCross = 3.6;
+	s_kdCross = 1.3;
+
+
 }
 
 
@@ -33,33 +48,69 @@ RunMode::~RunMode(){
 
 }
 
+
 int16_t RunMode::turningPID(CamHandler::Case routeCase ,int8_t routeMidP){
-//	if(routeCase == CamHandler::CrossRoute){
-//
-//	}
+	previousCase = currentCase;
+	currentCase = routeCase;
 	pre_angle_error = angle_error;
 	angle_error_sum += angle_error;
 	angle_error = 40 -routeMidP;
-	ideal_servo_degree = s_kp*angle_error + s_ki*angle_error_sum +  s_kd*(pre_angle_error - angle_error);
+	if(routeCase == CamHandler::Case::CrossRoute){
+		ideal_servo_degree = s_kpSRoute*angle_error + s_kdSRoute*(pre_angle_error - angle_error);
+	}
+	else if(routeCase == CamHandler::Case::InLeftBigCurve ){
+		ideal_servo_degree = s_kpBCurve*angle_error + s_kdBCurve*(pre_angle_error - angle_error);
+	}
+	else if(routeCase == CamHandler::Case::InRightBigCurve){
+			ideal_servo_degree = s_kpBCurveR*angle_error + s_kdBCurveR*(pre_angle_error - angle_error);
+	}
+	else if( routeCase == CamHandler::Case::InLeftCurve ){
+		ideal_servo_degree = s_kpSCurve*angle_error + s_kdSCurve*(pre_angle_error - angle_error);
+	}
+	else if(routeCase == CamHandler::Case::InRightCurve){
+			ideal_servo_degree = s_kpSCurveR*angle_error + s_kdSCurveR*(pre_angle_error - angle_error);
+	}
+	else if(routeCase == CamHandler::Case::StraightRoute){
+		ideal_servo_degree = s_kpStraight*angle_error + s_kdStraight*(pre_angle_error - angle_error);
+	}
+	else {
+		ideal_servo_degree = s_kpStraight*angle_error + s_kdStraight*(pre_angle_error - angle_error);
+	}
+
 	return ideal_servo_degree;
 }
 
 int16_t RunMode::motorPID (int16_t ideal_encoder_count){
 	motorspeed_error_prev = motorspeed_error;
-	motorspeed_error_sum += motorspeed_error;
 	motorspeed_error = ideal_encoder_count - encoder_count;
-	ideal_motor_speed = ideal_motor_speed + m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
-	//for 15 ms
-	ideal_motor_speed = (ideal_motor_speed) / 15-24;
+	motorspeed_error_sum += motorspeed_error;
+//	PID_Output = ideal_encoder_count +m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
+	//for 30 ms
+
+	ideal_motor_speed = m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
+//	ideal_motor_speed = (PID_Output+837.77)/32.664;
+	if(ideal_encoder_count == 0 || ideal_motor_speed <0)ideal_motor_speed = 0;
 //	if(encoder_count <=200 )return -1;
 	return ideal_motor_speed;
 	//check return, if always -1 then stop
 }
 
+void RunMode::motor_control(CamHandler::Case caseForward, uint16_t ideal_encoder_count){
+	uint16_t buff_speed = ideal_encoder_count;
+	if(caseForward == CamHandler::Case::StraightRoute){
+		if(ideal_encoder_count >0 )buff_speed = ideal_encoder_count + 3250;
+	}
+	if (caseForward == CamHandler::Case::InLeftBigCurve  || caseForward == CamHandler::Case::InRightBigCurve ){
+		buff_speed = ideal_encoder_count - 750;
+	}
+
+	motor_control(motorPID(buff_speed),true);
+
+}
 void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 	if(power > maxMotorSpeed) power = maxMotorSpeed;
 	if(power < minMotorSpeed) power = minMotorSpeed;
-	motor.SetClockwise(is_clockwise_rotating);
+	motor.SetClockwise(!is_clockwise_rotating);
 	ideal_motor_speed = power;
 	motor.SetPower(ideal_motor_speed);
 }
@@ -68,7 +119,7 @@ void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 void RunMode::servo_control(int16_t degree){
 	if(degree > maxServoAngle ) degree = maxServoAngle;
 	if(degree < minServoAngle ) degree = minServoAngle;
-	ideal_servo_degree = degree*10 + 992;
+	ideal_servo_degree = degree + 980;
 	servo.SetDegree(ideal_servo_degree);
 }
 
@@ -77,7 +128,7 @@ void RunMode::update_encoder(){
 }
 
 int32_t RunMode::get_encoder_count(){
-	encoder_count = encoder.GetCount();
+	encoder_count = -1 *encoder.GetCount();
 	return encoder_count;
 }
 
@@ -135,4 +186,23 @@ void RunMode::print_case(CamHandler::Case routecase){
 
 
 	}
+}
+
+void RunMode::update_Usensor(){
+	USsensor.Stop();
+	USsensor.Start();
+}
+
+bool RunMode::checkUSensor(){
+
+	if(USsensor.IsAvailable()){
+		objDistance = USsensor.GetDistance();
+		sensorWorked = true;
+	}
+	else {
+		objDistance = 0;
+		sensorWorked = false;
+	}
+
+	return sensorWorked;
 }

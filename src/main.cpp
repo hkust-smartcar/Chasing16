@@ -25,17 +25,19 @@ int main(void)
 	RunMode Run;
 	CamHandler Image;
 	pGrapher Grapher;
-	float s = 0.0f, k = 0.0f;
-	Timer::TimerInt init_time;
-	Timer::TimerInt persist_time;
-
-
+	Timer::TimerInt init_time = 0;
+	Timer::TimerInt persist_time = 0;
+	Timer::TimerInt current_time = 0;
+	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0, past_time4 = 0;
+	bool UsensorIsReady = false;
+//	Run.servo_control(0);
+//	while(1);
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
 
-	//tune encoder here
+	/*//tune encoder here
 	//to uncomment this code, comment all pVarManager object
-/*
+
 	k60::JyMcuBt106::Config config;
 	config.id = 0;
 	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
@@ -57,12 +59,12 @@ int main(void)
 	 if (motor_speed > 500) {	 Run.motor_control(0,true);while(1);}
 	 System::DelayMs(20);
  }
-*/
 
-	//28-6-2016
-	//y=30.136x-979.81, x=(y+979.81)/30.136 for x>56 and x->PWM, y->encoder count *(-1)
-	// thus , y=979.81-30.136x,  x= (979.81-y)/30.136
-	// this is for 30ms
+
+	//10-7-2016
+	//y=32.664x-837.77,  x->PWM, y->encoder count *(-1)
+	// thus , x = (y+837.77)/32.664
+	// this is for 30ms*/
 
 
 
@@ -85,45 +87,53 @@ int main(void)
 	//must init for using LCD and anything that contain function inside "System"
 	//use tick
 	//...
-	float speed = 0.0f;
-	Grapher.addSharedVar(&Run.s_kp,"s_kp");
-	Grapher.addSharedVar(&Run.s_kd,"s_kd");
-	Grapher.addSharedVar(&speed,"speed");
+	float speed = 0.0f, midPT = 0.0f;
 	float angle = 0.0f;
-	Grapher.addWatchedVar(&angle,"angle");
+	Grapher.addSharedVar(&Run.s_kpBCurve,"s_kpBCurve");
+	Grapher.addSharedVar(&Run.s_kdBCurve,"s_kdBCurve");
+	Grapher.addSharedVar(&Run.s_kpBCurveR,"s_kpBCurveR");
+	Grapher.addSharedVar(&Run.s_kdBCurveR,"s_kdBCurveR");
+	Grapher.addSharedVar(&speed,"speed");
+//	Grapher.addSharedVar(&angle,"angle");
+//	Grapher.addSharedVar(&Run.s_kpBCurve,"s_kpBCurve");
+//	Grapher.addSharedVar(&Run.s_kdBCurve,"s_kpBCurve");
+//	Grapher.addSharedVar(&Run.s_kpBCurveR,"s_kpBCurveR");
+//	Grapher.addSharedVar(&Run.s_kdBCurveR,"s_kpBCurveR");
+//	Grapher.addSharedVar(&Run.m_kp,"m_kp");
+//	Grapher.addWatchedVar(&angle,"angle");
+//	Grapher.addWatchedVar(&midPT,"midPT");
+//	Grapher.addWatchedVar(&Run.encoder_count,"encoder_count");
+//	Grapher.addWatchedVar(&speed,"speed");
 
 
-
-	Run.servo_control(0);
-	Timer::TimerInt current_time = 0;
-	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0;
 	Run.clearLcd(0);
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
-			if((int32_t)(current_time - past_time) >= 15){
+
+			if((int32_t)(current_time - past_time) >= 20){
 				past_time = current_time;
-////				Run.printRawCamGraph(0,40);
+//				Run.printRawCamGraph(0,40);
 				Run.updateCam();
 				Image.updateRawData(Run.get_raw_image());
-////				Run.print_case(Image.imageProcess());
-////				sprintf(haha,"mid %d", Image.getMidPT());
-////				Run.printCar(haha,116);
-				angle = Run.turningPID(Image.imageProcess(), Image.getMidPT());
+//				Run.print_case(Image.imageProcess());
+				midPT = Image.getMidPT();
+				angle = Run.turningPID(Image.imageProcess(), midPT);
+//				sprintf(haha,"error %d", Run.angle_error);
+//				Run.printCar(haha,116);
 				Run.servo_control(angle);
 				}
 			}
 
-		if((int32_t)(current_time - past_time3) >= 30){
-			past_time3 = current_time;
-			Grapher.sendWatchData();
-		}
 
-		if((int32_t)(current_time - past_time2) >= 15){
+
+		if((int32_t)(current_time - past_time2) >= 30){
 			past_time2 = current_time;
 			Run.update_encoder();
 			Run.get_encoder_count();
-			Run.motor_control(Run.motorPID(speed),0);
+			Grapher.sendWatchData();
+			Run.motor_control(Image.getPreviousCase(), speed);
+//			Run.motor_control(Run.motorPID(speed),1);
 			//motorPID
 		}
 	}
