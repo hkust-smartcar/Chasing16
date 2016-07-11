@@ -324,6 +324,7 @@ STATE determine_state(int8_t midpoints[HEIGHT], int midpoint_ending_index, int a
 		}
 		else return SPath;
 	}
+	//
 	// 3. test whether it is TurnLeft or TurnRight
 	else{
 		if(abs(b-c) < 15 && abs(c-d) < 15 && abs(b-d) < 15){
