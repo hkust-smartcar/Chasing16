@@ -188,45 +188,6 @@ void CamHandler::extractLeftLine(int16_t basePT){
 	LbreakPT = -1;
 	int16_t relativePT = basePT;	// the leftLine[i] will store distance from base point
 	bool reachBound;
-/*	if(shift == middle){	//that means must be some white in the right
-		leftLine[0] = 0;
-		for(int i = 1; i<60;i++){
-			leftLine[i] = leftLine[i-1];
-			relativePT = relativePT -80;
-			 outer loop->loop for every white pixel
-			 * inner loop->loop for scanning connected white pixel
-			if(intermediate[relativePT]){	//must be white for the right part, since there are suppose to exist a right edge
-				for(int j = 0; j < RangeOfSearchPT; j++){
-					if(!intermediate[relativePT-j-1]){
-						relativePT -= j;
-						leftLine[i] -= j;
-						break;
-					}
-				}
-				 if go here,then no point is located
-				// if no point if located:
-				LlineType = unknownType;
-
-			}
-			else{	// if the upper point is black, the left side is not possible to be white.
-					// Thus only need to scan for the left part, just to search for white in the right
-				for(int j = 1; j <= RangeOfSearchPT; j++){
-					if(intermediate[relativePT+j]){
-						relativePT += j;
-						leftLine[i] += j;
-						break;
-					}
-				}
-				 if go here,then no point is located
-				// if no point if located:
-				RlineType = unknownType;
-			}
-		}
-	}
-	else {	// currently left side is black, that means the car has/nearly out of the route may still extract line for future use
-		*/
-
-	//the above is commented because it contain wrong expectation,
 	leftLine[0] = 0;
 	for(int i = 1; i<57;i++){
 		reachBound = false;
@@ -268,11 +229,7 @@ void CamHandler::extractLeftLine(int16_t basePT){
 					return;
 				}
 			}
-//			/* wont go here, just to ensure */
-//			LlineType = unknownType;
-//			LbreakPT = i;
-//			return;
-			}
+		}
 		else{	// if the upper point is black, the left side is not possible to be white.
 				// Thus only need to scan for the left part, just to search for white in the right
 				for(int j = 1; j < RangeOfSearchPT; j++){
@@ -822,122 +779,4 @@ int8_t CamHandler::getMidPT(){
 	return midPT;
 }
 
-/* given up for this: */
-void CamHandler::camCorrection(){
-
-}
-
-
-void CamHandler::camCorrectionInit(int16_t x_size,int16_t y_size){
-	for(int i = x_size/-2; i < x_size/2; i++){
-		for(int j = y_size/2; j < y_size/-2; j--){
-
-		}
-
-	}
-}
-
-/*//version 1 decide case, have unknown bug to fix
- * int16_t leftSum = 0, rightSum = 0;
-int8_t lcounter = 0, rcounter = 0;
-int8_t leftEdge = 0, rightEdge = 0;
-if(shift == middle){	// both side is expected to have lines
-	if(RlineType == broken && LlineType == broken && RbreakPT < 50 && LbreakPT < 50){	//cant extract full line for both side, may due to + route
-		//or U or C route.
-		//to identify these route
-		for(int i = 0;i<=57;i++){
-			leftSum += leftLine[i];
-			if(!leftLine[i])lcounter++;
-			rightSum += rightLine[i];
-			if(!rightLine[i])rcounter++;
-		}
-		if(leftSum <= 0 && rightSum > 10){
-			if(rcounter < 2 && lcounter > 0){
-				routeCase = InLeftBigCurve;
-				return;
-			}else{
-				routeCase =  InComingLeftCurve;
-				return;
-			}
-		}
-		else if(leftSum > 10 && rightSum <= 0){
-			if(rcounter > 0 && lcounter < 2){
-				routeCase = InRightBigCurve;
-				return;
-			}else{
-				routeCase =  InComingRightCurve;
-				return;
-			}
-		}else if(rcounter>3 && lcounter >3){
-			for(int i = 0; i < (58-LbreakPT);i++){
-				if(intermediate[80*i]) leftEdge = i;
-			}
-			for(int i = 0; i < (58-RbreakPT);i++){
-				if(intermediate[80*i]) rightEdge = i;
-			}
-			if(leftEdge < rightEdge){ // for a cross, the vertex in the left is higher than right
-				routeCase = CrossRoutetoLeft;
-				return;
-			}
-			else{
-				routeCase = CrossRoutetoRight;
-				return;
-			}
-		}
-	}else if(RlineType == broken && LlineType != broken){
-		routeCase = InLeftCurve;
-		return;
-	}else if(RlineType != broken && LlineType == broken){
-		routeCase = InRightCurve;
-		return;
-	}else if(RlineType != broken && LlineType != broken) {
-		// it could be S route or straight route
-		int8_t lVertexCounter = 0, RVertexCounter = 0;
-		bool lWasZero = true, RWasZero = true;
-		int8_t lZeroCounter = 0, RZeroCounter = 0;
-		for(int i = 1; i < 58; i++){
-			if(leftLine[i] == 0){	// count the continuous zero
-				if(lWasZero)
-				lZeroCounter++;
-				continue;
-			}else if((leftLine[i-1]/leftLine[i]) < 0){	//if +ve turn -ve  or -ve turn +ve, +/- <0, i.e. vertex
-				lVertexCounter++;
-				continue;
-			}
-			if(leftLine[i] != 0) lWasZero = false;	// if zero not continue, false this flag
-		}
-		for(int i = 1; i < 58; i++){
-			if(rightLine[i] == 0){	// count the continuous zero
-				if(RWasZero)
-				RZeroCounter++;
-				continue;
-			}else if((rightLine[i-1]/rightLine[i]) < 0){	//if +ve turn -ve  or -ve turn +ve, +/- <0, i.e. vertex
-				RVertexCounter++;
-				continue;
-			}
-			if(rightLine[i] != 0) RWasZero = false;	// if zero not continue, false this flag
-		}
-		if(RVertexCounter > 1 || lVertexCounter > 1 ){	//any edge have more than 3 vertex
-			routeCase = SFront;
-			return;
-		}
-		else{
-			if(RZeroCounter > lZeroCounter){
-				routeCase = SlightRight;
-				return;
-			}
-			else if(RZeroCounter < lZeroCounter){
-				routeCase = SlightLeft;
-				return;
-			}
-			else{
-				routeCase = StraightRoute;
-				return;
-			}
-
-		}
-
-	}
-}*/
-/* above not ready for use */
 

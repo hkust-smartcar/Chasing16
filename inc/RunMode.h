@@ -11,41 +11,23 @@
 #include <array>
 #define WHITE 1
 #define BLACK 0
+
 class RunMode: public Car
 {
-	// tips for choosing datatype, dont use too large( it will slow down your program)
-	//and dont use too small (otherwise underflow occur)
-	// you may check 8bit,16bit,and 32bit int & uint range fromthe link:
-	//			http://www.societyofrobots.com/member_tutorials/book/export/html/341
-	//or just google that if u are not sure
 public:
 	RunMode();
 	~RunMode();
 
 	int16_t turningPID (CamHandler::Case ,int8_t routeMidP);
-	//PID = kp *error +kd *(error_prev - error) + ki * sum of error, in smartcar, ki can be neglected as its too small
-
 
 	int16_t motorPID (int16_t ideal_encoder_count);
-	//PID = kp *error +kd *(error_prev - error) + ki * sum of error, in smartcar, ki can be neglected as its too small
 
 	void motor_control(uint16_t power, bool is_clockwise_rotating);	//0~1000
-	//apply motor PID to improve the acceleration
-
-	void motor_control(CamHandler::Case ,uint16_t power);
-	// speed boost and reduce when straight route or big curve route
+	void motor_control(CamHandler::Case caseForward, uint16_t ideal_encoder_count, uint16_t frontObjDist);
 
 	void servo_control(int16_t degree); //-90 to 90
 
-	void adjust_image();	//correct the image
-
 	void print_case(CamHandler::Case routecase);
-
-	std::array<std::array<bool,80>,60> getRawData(Byte cam_data);
-
-	void extract_line();	//
-
-	void identify_road();	//
 
 	void update_encoder();
 
@@ -54,12 +36,6 @@ public:
 	void update_Usensor();
 	bool checkUSensor();
 	uint16_t getFrontObjDistance(){return objDistance;}
-	//for "GetCount()" of encoder, it return the difference of value between two update
-	//i.e. update ->process-with-2s->update->GetCount, the result is the encoder count within that process with 2s
-
-
-	//--------------------------variable below---------------------------//
-	//to access the public variable, you can use (obj_name).(var_name) to access
 
 	/* motor PID */
 	int32_t motor_speed_buff = 0, ideal_motor_speed = 0;

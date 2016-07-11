@@ -30,7 +30,9 @@ int main(void)
 	Timer::TimerInt current_time = 0;
 	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0, past_time4 = 0;
 	bool UsensorIsReady = false;
-//	Run.servo_control(0);
+	Run.servo_control(0);
+	uint16_t distance = 0;
+//	char haha[30];
 //	while(1);
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
 //uncomment for usage
@@ -81,7 +83,6 @@ int main(void)
 //	config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
 //	k60::JyMcuBt106 fuck(config);
 //	char* buffer = new char[100]{0};
-//	char haha[30];
 //	int n;
 //	Byte* RawData = nullptr;
 	//must init for using LCD and anything that contain function inside "System"
@@ -100,10 +101,10 @@ int main(void)
 //	Grapher.addSharedVar(&Run.s_kpBCurveR,"s_kpBCurveR");
 //	Grapher.addSharedVar(&Run.s_kdBCurveR,"s_kpBCurveR");
 //	Grapher.addSharedVar(&Run.m_kp,"m_kp");
-//	Grapher.addWatchedVar(&angle,"angle");
-//	Grapher.addWatchedVar(&midPT,"midPT");
+	Grapher.addWatchedVar(&angle,"angle");
+	Grapher.addWatchedVar(&midPT,"midPT");
 //	Grapher.addWatchedVar(&Run.encoder_count,"encoder_count");
-//	Grapher.addWatchedVar(&speed,"speed");
+	Grapher.addWatchedVar(&distance,"distance");
 
 
 	Run.clearLcd(0);
@@ -111,7 +112,7 @@ int main(void)
 		if(current_time !=System::Time()){
 			current_time = System::Time();
 
-			if((int32_t)(current_time - past_time) >= 20){
+			if((int32_t)(current_time - past_time) >= 12){
 				past_time = current_time;
 //				Run.printRawCamGraph(0,40);
 				Run.updateCam();
@@ -119,23 +120,33 @@ int main(void)
 //				Run.print_case(Image.imageProcess());
 				midPT = Image.getMidPT();
 				angle = Run.turningPID(Image.imageProcess(), midPT);
-//				sprintf(haha,"error %d", Run.angle_error);
-//				Run.printCar(haha,116);
 				Run.servo_control(angle);
 				}
 			}
-
-
 
 		if((int32_t)(current_time - past_time2) >= 30){
 			past_time2 = current_time;
 			Run.update_encoder();
 			Run.get_encoder_count();
 			Grapher.sendWatchData();
-			Run.motor_control(Image.getPreviousCase(), speed);
+			Run.motor_control(Image.getPreviousCase(), speed, distance);
 //			Run.motor_control(Run.motorPID(speed),1);
-			//motorPID
 		}
+
+		if(!UsensorIsReady){
+			past_time3 = current_time;
+			Run.update_Usensor();
+			UsensorIsReady = true;
+		}
+//
+		if((int32_t)(current_time - past_time4) >= 50 && UsensorIsReady){
+			past_time4 = current_time;
+			if(Run.checkUSensor()) UsensorIsReady = false;
+			distance = Run.getFrontObjDistance();
+		}
+
+
+
 	}
 
 

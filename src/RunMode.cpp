@@ -40,14 +40,11 @@ RunMode::RunMode(){
 	s_kpCross = 3.6;
 	s_kdCross = 1.3;
 
-
 }
-
 
 RunMode::~RunMode(){
 
 }
-
 
 int16_t RunMode::turningPID(CamHandler::Case routeCase ,int8_t routeMidP){
 	previousCase = currentCase;
@@ -95,15 +92,21 @@ int16_t RunMode::motorPID (int16_t ideal_encoder_count){
 	//check return, if always -1 then stop
 }
 
-void RunMode::motor_control(CamHandler::Case caseForward, uint16_t ideal_encoder_count){
+void RunMode::motor_control(CamHandler::Case caseForward, uint16_t ideal_encoder_count, uint16_t frontObjDist){
 	uint16_t buff_speed = ideal_encoder_count;
 	if(caseForward == CamHandler::Case::StraightRoute){
 		if(ideal_encoder_count >0 )buff_speed = ideal_encoder_count + 3250;
 	}
-	if (caseForward == CamHandler::Case::InLeftBigCurve  || caseForward == CamHandler::Case::InRightBigCurve ){
+	else if (caseForward == CamHandler::Case::InLeftBigCurve  || caseForward == CamHandler::Case::InRightBigCurve ){
 		buff_speed = ideal_encoder_count - 750;
 	}
 
+	if(frontObjDist != 0 || frontObjDist >1000){
+		if(frontObjDist < 150) buff_speed = 0;
+		else if(frontObjDist < 400) ;
+		else if(buff_speed <1000)buff_speed += 1000;
+		else ;
+	}
 	motor_control(motorPID(buff_speed),true);
 
 }
@@ -202,6 +205,7 @@ bool RunMode::checkUSensor(){
 	else {
 		objDistance = 0;
 		sensorWorked = false;
+
 	}
 
 	return sensorWorked;

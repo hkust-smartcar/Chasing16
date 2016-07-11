@@ -40,14 +40,6 @@ Car::Car():
 	/***********************************variable below**********************************/
 	image_size = cam.GetH() * cam.GetW() / 8;
 }
-	// for constructor, you can temporarily understand it as :
-	// initialize all variable ( & pointer)
-	// for the word "new", it is to create dynamic object.
-	// dynamic object means, it will always exist once you create it.
-	// opposite of dynamic is static.
-	//  int a; <----its static, meamory space of a will be release out the scope
-	//  int* a = new int; <----its dynamic, meamory space of datatype int will be preserved, and "new int" will
-	// return the address of that meamory space. Thats why we use a pointer to store the address.
 
 Car::Car(libsc::k60::JyMcuBt106::Config cfg , bool isHC06):
 		cam(GetCameraConfig()),
@@ -75,52 +67,51 @@ Car::Car(libsc::k60::JyMcuBt106::Config cfg , bool isHC06):
 	cam.Start();
 	image_size = cam.GetH() * cam.GetW() / 8;
 	}
+
 Car::~Car(){
 	cam.Stop();
 }
-	// for destructor, you can understand as following
-	// "how many times you "new" a object in constructor, same amount of "delete" you need to put in destructor"
-	// if you "new" a object but dont "delete" it, the object will forever exist.( for more search "memory leak" )
 
-void Car::printvalue(int16_t value, uint16_t color){
+void Car::printvalue(int32_t value, uint16_t color){
 	LCD.SetRegion(libsc::Lcd::Rect(0,0,128,40));
-	std::string Result;
-	std::ostringstream convert;
-	convert << value;
-	Result = convert.str();
-	const char *s = Result.c_str();
+	sprintf(haha,"error %I32d", value);
 	LCDwriter.SetTextColor(color);
-	LCDwriter.WriteString(s);
+	LCDwriter.WriteString(haha);
 }
-
-void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, uint16_t color){
-	LCD.SetRegion(libsc::Lcd::Rect(x,y,w,h));
-	std::string Result;
-	std::ostringstream convert;
-	convert << value;
-	Result = convert.str();
-	const char *s = Result.c_str();
-	LCDwriter.SetTextColor(color);
-	LCDwriter.WriteString(s);
-}
-
+//
+//void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,int16_t value, uint16_t color){
+//	LCD.SetRegion(libsc::Lcd::Rect(x,y,w,h));
+//	std::string Result;
+//	std::ostringstream convert;
+//	convert << value;
+//	Result = convert.str();
+//	const char *s = Result.c_str();
+//	LCDwriter.SetTextColor(color);
+//	LCDwriter.WriteString(s);
+//}
+//
 void Car::printCar(std::string Result, int8_t line){
 	LCD.SetRegion(libsc::Lcd::Rect(0,line,128,40));
 	const char *s = Result.c_str();
 	LCDwriter.WriteString(s);
 }
-
+//
 void Car::printvalue(std::string Result){
 	LCD.SetRegion(libsc::Lcd::Rect(0,0,128,40));
 	const char *s = Result.c_str();
 	LCDwriter.WriteString(s);
 }
-
-void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,std::string Result){
-	LCD.SetRegion(libsc::Lcd::Rect(x,y,w,h));
-	const char *s = Result.c_str();
-	LCDwriter.WriteString(s);
-}
+//
+//void Car::printvalue(int16_t x,int16_t y,int16_t w,int16_t h,std::string Result){
+//	LCD.SetRegion(libsc::Lcd::Rect(x,y,w,h));
+//	const char *s = Result.c_str();
+//	LCDwriter.WriteString(s);
+//}
+//
+//void Car::printline(int16_t value ,uint16_t color){
+//	LCD.SetRegion(libsc::Lcd::Rect(0,value * 160 / 255,128,1));
+//	LCD.FillColor(color);
+//}
 
 void Car::printRawCamGraph(Uint x, Uint y){//directly print Car's private 'data[600]' at(x,y)
 	LCD.SetRegion(Lcd::Rect(x,y,80,60));
@@ -140,11 +131,6 @@ Byte* Car::get_raw_image(){
 	updateCam();
 	return data;
 
-}
-
-void Car::printline(int16_t value ,uint16_t color){
-	LCD.SetRegion(libsc::Lcd::Rect(0,value * 160 / 255,128,1));
-	LCD.FillColor(color);
 }
 
 void Car::clearLcd (uint16_t color){
@@ -208,9 +194,4 @@ libsc::Joystick::State Car::getjoystick(){
 	return joystick.GetState();
 }
 
-int16_t Car::otsu_threshold(){
-	//wait for implementation
-	//wait for kitty's improved(that mean fast) otsu alogrithm
-	return 0;
-}
 

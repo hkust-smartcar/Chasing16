@@ -31,15 +31,12 @@ public:
 
 	void convertBit();
 	bool getcertainBit(int16_t);
-	void camCorrection();	//not ready
-	void camCorrectionInit(int16_t x_size, int16_t y_size);	//not ready
 	void extractBase();
 	void extractLeftLine(int16_t basePT);
 	void extractRightLine(int16_t basePT);
 	void lineProcess();
 	int8_t checkWhite();
 	bool checkLine(bool isLeft);
-	void filterBase3Line();
 	void updateRawData(Byte* rawData);
 	Byte* getRawData(){return RawData;}
 	void setImageSize(int16_t imageSize){ImageSize = imageSize;}
