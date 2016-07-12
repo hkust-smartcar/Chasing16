@@ -64,7 +64,7 @@ public:
 
 	/* motor control */
 	int16_t straight_counter =0;
-
+	uint16_t buff_speed = 0;
 	/* Usensor */
 	uint16_t objDistance = 0;
 	bool sensorWorked = false;

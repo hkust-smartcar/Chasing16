@@ -503,11 +503,11 @@ void CamHandler::lineProcess(){
 		}
 		//new add to fix some bug, than the sight of the camera is too far, it should be more localize
 		if(leftVertex > 0 ||rightVertex >0){
-			if((RbreakPT >= LbreakPT  || RbreakPT == -1)&& (leftSumUVright -leftSumUntilVertex) < -400  && leftSumUVright >-50){	// vertax for left edge
+			if((RbreakPT > LbreakPT  || (RbreakPT == -1 && LbreakPT != -1))	&& (leftSumUVright -leftSumUntilVertex) < -400  && leftSumUVright >-50){	// vertax for left edge
 				routeCase = InRightCurve;
 				return;
 			}
-			if((RbreakPT <= LbreakPT || LbreakPT == -1) && (rightSumUntilVertex + rightSumUVleft) < -400 && rightSumUVleft <50){	// vertax for left edge
+			if((RbreakPT < LbreakPT || (LbreakPT == -1 && RbreakPT != -1)) && (rightSumUntilVertex + rightSumUVleft) < -400 && rightSumUVleft <50){	// vertax for left edge
 				routeCase = InLeftCurve;
 				return;
 			}
@@ -521,6 +521,11 @@ void CamHandler::lineProcess(){
 			}
 		}
 
+		if(((rightRelativeSum + leftRelativeSum) < 10 &&(rightRelativeSum + leftRelativeSum) > -10)){
+			// future improvement to assure its a straight line
+			routeCase = StraightRoute;
+			return;
+		}
 
 		//special process for cross road
 		if((checkWhite() > 5 && (leftSum > rightSum ) && (rightStartFromEdge || leftStartFromEdge)) ||
@@ -554,11 +559,7 @@ void CamHandler::lineProcess(){
 			if(rightZero < 5 && rightZero > -1)routeCase = InRightBigCurve;
 			return;
 		}
-		if(((rightRelativeSum + leftRelativeSum) < 5 ||(rightRelativeSum + leftRelativeSum) > -5)){
-			// future improvement to assure its a straight line
-			routeCase = StraightRoute;
-			return;
-		}
+
 	}
 	else if(shift == left || shift == CLeft){
 		routeCase = InLeftBigCurve;
@@ -727,16 +728,16 @@ int8_t CamHandler::getMidPT(){
 	int16_t temp = -20, counter = 0, temp1 = 20;
 	prevMidPT = midPT;
 		if(routeCase == StraightRoute){
-			leftRelativePT = LBasePT%80 + leftLine[2];
-			rightRelativePT = RBasePT%80 + + rightLine[2];
+			leftRelativePT = LBasePT%80 + leftLine[4];
+			rightRelativePT = RBasePT%80 + + rightLine[4];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == InLeftCurve || routeCase == InRightCurve){
-			leftRelativePT = LBasePT%80 + leftLine[22];
-			rightRelativePT = RBasePT%80 + rightLine[22];
+			leftRelativePT = LBasePT%80 + leftLine[20];
+			rightRelativePT = RBasePT%80 + rightLine[20];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == InLeftBigCurve || routeCase == InRightBigCurve){
-			leftRelativePT = LBasePT%80+ leftLine[22];
-			rightRelativePT = RBasePT%80+ rightLine[22];
+			leftRelativePT = LBasePT%80+ leftLine[20];
+			rightRelativePT = RBasePT%80+ rightLine[20];
 			midPT = (leftRelativePT + rightRelativePT)/2;
 		}else if(routeCase == SFront){
 			if(leftVertexFirst != -1 && rightVertexFirst != -1){

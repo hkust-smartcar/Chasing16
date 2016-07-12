@@ -16,9 +16,9 @@ RunMode::RunMode(){
 	ideal_motor_speed = 0;
 	PID_Output = 0;
 	encoder_count = 0;
-	m_kp = 0.103;
-	m_ki = 0.033;
-	m_kd = 0;
+	m_kp = 0.10100000351667404;
+	m_ki = 0.01;
+	m_kd = 0.038;
 
 	//servo
 	ideal_servo_degree = 0;
@@ -82,34 +82,31 @@ int16_t RunMode::motorPID (int16_t ideal_encoder_count){
 	motorspeed_error = ideal_encoder_count - encoder_count;
 	motorspeed_error_sum += motorspeed_error;
 //	PID_Output = ideal_encoder_count +m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
-	//for 30 ms
-
 	ideal_motor_speed = m_kp*motorspeed_error + m_ki*motorspeed_error_sum +  m_kd*(motorspeed_error_prev - motorspeed_error);
 //	ideal_motor_speed = (PID_Output+837.77)/32.664;
 	if(ideal_encoder_count == 0 || ideal_motor_speed <0)ideal_motor_speed = 0;
-//	if(encoder_count <=200 )return -1;
 	return ideal_motor_speed;
-	//check return, if always -1 then stop
 }
 
 void RunMode::motor_control(CamHandler::Case caseForward, uint16_t ideal_encoder_count, uint16_t frontObjDist){
-	uint16_t buff_speed = ideal_encoder_count;
-	if(caseForward == CamHandler::Case::StraightRoute){
-		if(ideal_encoder_count >0 )buff_speed = ideal_encoder_count + 3250;
-	}
-	else if (caseForward == CamHandler::Case::InLeftBigCurve  || caseForward == CamHandler::Case::InRightBigCurve ){
-		buff_speed = ideal_encoder_count - 750;
-	}
+	buff_speed = ideal_encoder_count;
+	if(buff_speed != 0){
+		if(caseForward == CamHandler::Case::StraightRoute){
+			buff_speed = ideal_encoder_count* 1.4;
+		}
+		else if (caseForward == CamHandler::Case::InLeftBigCurve  || caseForward == CamHandler::Case::InRightBigCurve ){
+			buff_speed = ideal_encoder_count*0.9;
+		}
 
-	if(frontObjDist != 0 || frontObjDist >1000){
-		if(frontObjDist < 150) buff_speed = 0;
-		else if(frontObjDist < 400) ;
-		else if(buff_speed <1000)buff_speed += 1000;
-		else ;
+		if(frontObjDist != 0 && frontObjDist <800){
+			if(frontObjDist < 200) buff_speed = 0;
+			else if(frontObjDist < 400) buff_speed *= (1 - (frontObjDist-200) /200) ;
+			else if(frontObjDist < 700) buff_speed *=   ( 1 - (frontObjDist-400) /400) ;
+		}
 	}
 	motor_control(motorPID(buff_speed),true);
-
 }
+
 void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 	if(power > maxMotorSpeed) power = maxMotorSpeed;
 	if(power < minMotorSpeed) power = minMotorSpeed;
@@ -122,7 +119,7 @@ void RunMode::motor_control(uint16_t power, bool is_clockwise_rotating){
 void RunMode::servo_control(int16_t degree){
 	if(degree > maxServoAngle ) degree = maxServoAngle;
 	if(degree < minServoAngle ) degree = minServoAngle;
-	ideal_servo_degree = degree + 980;
+	ideal_servo_degree = degree + 970;
 	servo.SetDegree(ideal_servo_degree);
 }
 

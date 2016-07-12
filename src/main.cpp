@@ -30,7 +30,6 @@ int main(void)
 	Timer::TimerInt current_time = 0;
 	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0, past_time4 = 0;
 	bool UsensorIsReady = false;
-	Run.servo_control(0);
 	uint16_t distance = 0;
 //	char haha[30];
 //	while(1);
@@ -94,16 +93,24 @@ int main(void)
 	Grapher.addSharedVar(&Run.s_kdBCurve,"s_kdBCurve");
 	Grapher.addSharedVar(&Run.s_kpBCurveR,"s_kpBCurveR");
 	Grapher.addSharedVar(&Run.s_kdBCurveR,"s_kdBCurveR");
+//	Grapher.addSharedVar(&Run.s_kpSCurve,"s_kpSCurve");
+//	Grapher.addSharedVar(&Run.s_kdSCurve,"s_kdSCurve");
+//	Grapher.addSharedVar(&Run.s_kpSCurveR,"s_kpSCurveR");
+//	Grapher.addSharedVar(&Run.s_kdSCurveR,"s_kdSCurveR");
+//	Grapher.addSharedVar(&Run.s_kpSRoute,"s_kpSRoute");
+//	Grapher.addSharedVar(&Run.s_kdSRoute,"s_kdSRoute");
+//	Grapher.addSharedVar(&Run.s_kpStraight,"s_kpStraight");
+//	Grapher.addSharedVar(&Run.s_kdStraight,"s_kdStraight");
+//	Grapher.addSharedVar(&Run.s_kpCross,"s_kpCross");
+//	Grapher.addSharedVar(&Run.s_kdCross,"s_kdCross");
 	Grapher.addSharedVar(&speed,"speed");
 //	Grapher.addSharedVar(&angle,"angle");
-//	Grapher.addSharedVar(&Run.s_kpBCurve,"s_kpBCurve");
-//	Grapher.addSharedVar(&Run.s_kdBCurve,"s_kpBCurve");
-//	Grapher.addSharedVar(&Run.s_kpBCurveR,"s_kpBCurveR");
-//	Grapher.addSharedVar(&Run.s_kdBCurveR,"s_kpBCurveR");
 //	Grapher.addSharedVar(&Run.m_kp,"m_kp");
+//	Grapher.addSharedVar(&Run.m_ki,"m_ki");
+//	Grapher.addSharedVar(&Run.m_kd,"m_kd");
 	Grapher.addWatchedVar(&angle,"angle");
 	Grapher.addWatchedVar(&midPT,"midPT");
-//	Grapher.addWatchedVar(&Run.encoder_count,"encoder_count");
+	Grapher.addWatchedVar(&Run.encoder_count,"encoder_count");
 	Grapher.addWatchedVar(&distance,"distance");
 
 
@@ -111,6 +118,15 @@ int main(void)
 	while(1){
 		if(current_time !=System::Time()){
 			current_time = System::Time();
+
+			if((int32_t)(current_time - past_time2) >= 30){
+				past_time2 = current_time;
+				Run.update_encoder();
+				Run.get_encoder_count();
+				Grapher.sendWatchData();
+				Run.motor_control(Image.getPreviousCase(), speed, distance);
+//				Run.motor_control(Run.motorPID(speed),1);
+			}
 
 			if((int32_t)(current_time - past_time) >= 12){
 				past_time = current_time;
@@ -124,21 +140,12 @@ int main(void)
 				}
 			}
 
-		if((int32_t)(current_time - past_time2) >= 30){
-			past_time2 = current_time;
-			Run.update_encoder();
-			Run.get_encoder_count();
-			Grapher.sendWatchData();
-			Run.motor_control(Image.getPreviousCase(), speed, distance);
-//			Run.motor_control(Run.motorPID(speed),1);
-		}
-
-		if(!UsensorIsReady){
+		if(!UsensorIsReady && (past_time3 - current_time ) >1){
 			past_time3 = current_time;
 			Run.update_Usensor();
 			UsensorIsReady = true;
 		}
-//
+
 		if((int32_t)(current_time - past_time4) >= 50 && UsensorIsReady){
 			past_time4 = current_time;
 			if(Run.checkUSensor()) UsensorIsReady = false;
