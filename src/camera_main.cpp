@@ -24,7 +24,6 @@
 #include <sstream>
 #include <string>
 #include "libsc/lcd.h"
-#include "img_regression.h"
 #include "img_process_compilation.h"
 #include <cmath>
 #include <math.h>
@@ -88,9 +87,9 @@ bool GetPixel(const Byte* src, const int8_t x, const int8_t y) ;
 void capture_image(void);
 //void print_Count(int encoder_count);
 //void speed_and_angle_control(RunMode& car, int current_position, double gradient);
-//void print_Count(int encoder_count);
+void print_Count(int encoder_count);
 //void current_position_PD(float& P, float& D, int k);
-void print_midpoints_and_edges(int midpoints[HEIGHT],int ending_index);
+void print_midpoints_and_edges(int8_t midpoints[HEIGHT],int8_t ending_index);
 //void print_State(STATE state);
 //int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column);
 
@@ -107,6 +106,10 @@ struct RunMode{
 
 	STATE current_state = GoStraight;
 	int8_t last_midpoint = WIDTH/2;
+
+	int8_t max_consecutive_midpoint_diff = 0;
+	int16_t TrackArea = 0;
+	int8_t separating_index = 0;
 //	STATE previous_state = GoStraight;
 };
 
@@ -117,6 +120,10 @@ int main(){
 	System::Init();
 	Timer::TimerInt t = 0;
 	Timer::TimerInt tick = System::Time();
+	Timer::TimerInt triangle_time = 0;
+	bool triangle_detector_1 = false, triangle_detector_2 = false, triangle_detector_3 = false;
+	bool triangle = false, reached_triangle = false;
+	int triangle_count_1 = 0, triangle_count_2 = 0, triangle_count_3 = 0;
 
 
 	// configuration
@@ -148,7 +155,9 @@ int main(){
 			System::DelayMs(20);
 		}
 */
+//	float state = 0;
 
+//	float test_coef_1 = 0.0f; float test_coef_2 = 0.0f; double test_grad = 1; double test_grad_1 = 1;
 
 	bool UPDATE_SERVO = 1;
 	Runner.ideal_motor_speed = 0;
@@ -156,16 +165,32 @@ int main(){
 	bool run = false;
 	int area = 0;
 	float encoder_count = 0.0f;
-	int nearest = 0, furthest = 0, left = 0, right = 0;
-	float run_f = 0.0f, area_f = 0.0f, nearest_f = 0.0f, furthest_f = 0.0f, left_f = 0.0f, right_f = 0.0f;
+//	float area_f = 0.0f;
+//	int nearest = 0, furthest = 0, left = 0, right = 0;
+//	float run_f = 0.0f, area_f = 0.0f, nearest_f = 0.0f, furthest_f = 0.0f, left_f = 0.0f, right_f = 0.0f;
+//	float max_diff = 0.0f, absolute_midpoint_index_f = 0.0f; float AREA = 0.0f; float separating_index_f = 0.0f;
 
 	//PGrapher: Share and Watch Variables
-	pGrapher Grapher;
-//	Grapher.addSharedVar(&Kp,"Motor PID Kp");
+//	pGrapher Grapher;
 
-	Grapher.addWatchedVar(&area,"Area of Triangle");
-	Grapher.addWatchedVar(&encoder_count,"Encoder Count");
-//	Grapher.addWatchedVar(&nearest,"Nearest triangle");
+	float Kp = 0, Ki = 0, Kd = 0;
+
+//	Grapher.addSharedVar(&Kp,"Motor PID Kp");
+//	Grapher.addSharedVar(&Ki,"Motor PID Ki");
+//	Grapher.addSharedVar(&Kd,"Motor PID Kd");
+/*
+	float angle_1 = 0; float angle_2 = 0; float angle_3 = 0; float angle_4 = 0;float separating_index_f = 0.0f;
+	float mid_point_index_f = 0;
+*/
+//	float is_triangle = 0.0f;
+
+//	Grapher.addWatchedVar(&is_triangle, "Check Triangle");
+//	Grapher.addWatchedVar(&encoder_count,"Encoder Count");
+//	Grapher.addWatchedVar(&separating_index_f,"Separating Index");
+//	Grapher.addWatchedVar(&mid_point_index_f,"Mid Point Ending Index");
+//	Grapher.addWatchedVar(&angle_4,"angle_4");
+//	Grapher.addWatchedVar(&angle_3,"angle_3");
+//	Grapher.addWatchedVar(&angle_2,"angle_2");
 //	Grapher.addWatchedVar(&furthest,"furthest triangle");
 //	Grapher.addWatchedVar(&left,"Most left");
 //	Grapher.addWatchedVar(&right,"Most right");
@@ -178,9 +203,12 @@ int main(){
 		if(tick!= System::Time()){
 			tick = System::Time();
 		}
+		if(triangle_time != System::Time()){
+			triangle_time = System::Time();
+		}
 
 		// Update PGrapher
-		Grapher.sendWatchData();
+//		Grapher.sendWatchData();
 
 		Led1->SetEnable(x%4 == 0);
 		Led2->SetEnable(x%4 == 1);
@@ -193,16 +221,57 @@ int main(){
 
 		capture_image();
 
-		print2DCam(10,10,image);	//Print camera image
+//		print2DCam(10,10,image);	//Print camera image
 
-		TCount = update_midpoints_and_edges(image,midpoints, midpoint_ending_index,absolute_midpoint_ending_index, Runner.last_midpoint, WCount);
+
+		TCount = update_midpoints_and_edges(image,midpoints, midpoint_ending_index,absolute_midpoint_ending_index, Runner.last_midpoint,Runner.max_consecutive_midpoint_diff,Runner.separating_index, Runner.TrackArea, WCount);
+//		separating_index_f = (float) Runner.separating_index;
+//		mid_point_index_f = (float) midpoint_ending_index;
+//		separating_index_f = (float) Runner.separating_index;
+
+//		absolute_midpoint_index_f = absolute_midpoint_ending_index;
+//		max_diff = Runner.max_consecutive_midpoint_diff;
+//		AREA = Runner.TrackArea;
+
+//		regression_line(midpoints,HEIGHT-1,Runner.separating_index,test_grad,test_coef_1);
+//		regression_line(midpoints,Runner.separating_index-1,midpoint_ending_index,test_grad_1,test_coef_2);
+//		test_grad = ((int(180*atan(test_grad)/PI)+180)%180);
+//		test_grad_1 = ((int(180*atan(test_grad_1)/PI)+180)%180);
 
 //		if(check_triangle(image,absolute_midpoint_ending_index,WIDTH/2) > 100){ // need to tune
 //			Runner.current_state = Triangle;
 //		}
 //		else{
-			Runner.current_state = determine_state(midpoints,midpoint_ending_index, absolute_midpoint_ending_index, TCount, WCount);
+			Runner.current_state = determine_state(midpoints,midpoint_ending_index, absolute_midpoint_ending_index, TCount, WCount, Runner.separating_index, 0, triangle, reached_triangle);
 //		}
+//			if(Runner.current_state == Triangle){
+//				motor->SetPower(0);
+//				bx/reak;
+//			}
+
+
+//			double gradient = 0; double gradient1 = 0; double gradient2 = 0; double gradient3 = 0; float coef = 1; int a = 0; int b = 0; int c = 0; int d = 0;
+//				if(1){
+//					regression_line(midpoints,HEIGHT-1,(Runner.separating_index + HEIGHT-1)/2,gradient);
+//					regression_line(midpoints,(Runner.separating_index + HEIGHT-1)/2 -1 ,Runner.separating_index,gradient1);
+//					regression_line(midpoints,Runner.separating_index-1,(midpoint_ending_index + Runner.separating_index-1)/2,gradient2);
+//					regression_line(midpoints,(midpoint_ending_index + Runner.separating_index-1)/2 - 1,midpoint_ending_index,gradient3);
+//
+//					double test_grad = 0;
+//					regression_line(midpoints,HEIGHT-1,Runner.separating_index,test_grad);
+//
+//					test_grad = (int((180*atan(test_grad)/PI)+180)%180);
+//					a = (int((180*atan(gradient)/PI)+180)%180);
+//					b = (int((180*atan(gradient1)/PI)+180)%180);
+//					c = (int((180*atan(gradient2)/PI)+180)%180);
+//					d = (int((180*atan(gradient3)/PI)+180)%180);
+//
+//					angle_1 = float(a);
+//					angle_2 = float(b);
+//					angle_3 = float(c);
+//					angle_4 = float(d);
+//
+//				}
 
 		//-------------------- SERVO PID ----------------------//
 		if(UPDATE_SERVO){
@@ -211,42 +280,61 @@ int main(){
 
 			if(Runner.current_state == GoStraight){
 				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
-				P = 15;
-//				P = 15;
+//								P = 15;
+				P = 11;
 				D = 1;
 				count = 190;
 				//			count = 300;
 			}
 			else if(Runner.current_state == SPath){
 				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
-				P = 13 - ((encoder->GetCount() + 90)/20)*2;
-//				P = 23;
-				D = 2;
+				//				P = 13 - ((encoder->GetCount() + 90)/20)*2;
+				if(Runner.ServoErr >= 0){
+				P = 14;
+				}
+				else{
+				P = 16.5;
+				}
+
+//				P = 14;
+				D = 1;
 				count = 180;
 				//			count = 210;
 			}
 			else if(Runner.current_state == TurnLeft){
 				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
-				P = 16.5 - ((encoder->GetCount() + 90)/20)*2;
-//				P = 27;
-				D = 2;
+				//				P = 16.5 - ((encoder->GetCount() + 90)/20)*2;
+				//				P = 20;
+				P = 18.5;
+//				P = 18;
+				D = 1;
 				count = 170;
 			}
 			else if(Runner.current_state == TurnRight){
 				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
-				P = 16.5 - ((encoder->GetCount() + 90)/20)*2;
-//				P = 27;
-				D = 2;
+				//				P = 16.5 - ((encoder->GetCount() + 90)/20)*2;
+				P = 25;
+//				P = 18.5;
+//				P = 26;
+				D = 1;
 				count = 170;
 			}
-			else if(Runner.current_state == Triangle){
-				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
-				P = 15;
+//			else if(Runner.current_state == Triangle){
+//				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
 //				P = 15;
-				D = 1;
-				count = 190;
-			}
-//			count = 180;
+////				P = 15;
+//				D = 1;
+//				count = 190;
+//			}
+//			else if(Runner.current_state == OvertakeZone){
+//				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
+//				P = 15;
+////				P = 15;
+//				D = 1;
+//				count = 190;
+//			}
+
+			count = 190;
 
 			int32_t ideal_servo_degree = uint16_t(900 + P*Runner.ServoErr + D*(Runner.ServoErr - Runner.ServoPrevErr));
 			Runner.ServoPrevErr = Runner.ServoErr;
@@ -262,9 +350,9 @@ int main(){
 
 
 		//-------------------- MOTOR PID ----------------------//
-		float Kd = 0.010f;
-		float Ki = 0.020f;
-		float Kp = 0.01f;
+		float Kd = 0.01f;
+		float Ki = 0.015f;
+		float Kp = 0.02f;
 
 		encoder->Update();
 		Runner.MotorErr = count + encoder->GetCount();
@@ -297,24 +385,91 @@ int main(){
 //			print_Count(check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 + 1));
 //		else print_Count(0);
 
-//		encoder->Update();
-		encoder_count = -1 * (float) encoder->GetCount();
+//		encoder->Update()
+//		encoder_count = -1 * (float) encoder->GetCount();
 //		check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 - 1, left, right, area, nearest, furthest);
-		area = check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 - 1);
-		if (area == 0){
-			area = check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 + 1);
+
+
+		if(!reached_triangle){
+			area = check_triangle(image, absolute_midpoint_ending_index, WIDTH/2);
+			if (area == 0){
+				area = check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 - 3);
+			}
+			if (area == 0){
+				area = check_triangle(image, absolute_midpoint_ending_index, WIDTH/2 + 3);
+			}
+			if(area > 150 && area < 225 && !triangle_detector_2 && !triangle_detector_3){
+				triangle_detector_1 = true;
+				triangle_count_1++;
+				if(System::Time() - triangle_time < 200){
+					if(triangle_count_1 > 5){
+						triangle_detector_2 = true;
+						//					triangle_time = System::Time();
+					}
+				}
+				else if(triangle_count_1 < 5){
+					triangle_detector_1 = false;
+					triangle_count_1 = 0;
+				}
+			}
+			if(triangle_detector_2 && !triangle_detector_3){
+				if(area > 225 && area < 300){
+					triangle_count_2++;
+				}
+				if(System::Time() - triangle_time < 400){
+					if(triangle_count_2 > 5){
+						triangle_detector_3 = true;
+						//					triangle_time = System::Time();
+					}
+				}
+				else if(triangle_count_2 < 5){
+					triangle_count_1 = 0;
+					triangle_count_2 = 0;
+					triangle_detector_1 = false;
+					triangle_detector_2 = false;
+				}
+			}
+			if(triangle_detector_3){
+				if(area > 300){
+					triangle_count_3++;
+				}
+				if(System::Time() - triangle_time < 600){
+					if(triangle_count_3 > 4){
+						triangle = true;
+					}
+				}
+				else if(triangle_count_3 < 4){
+					triangle_count_1 = 0;
+					triangle_count_2 = 0;
+					triangle_count_3 = 0;
+					triangle_detector_1 = false;
+					triangle_detector_2 = false;
+					triangle_detector_3 = false;
+				}
+			}
+
+			if(!triangle_detector_1 && !triangle_detector_2 && !triangle_detector_3){
+				triangle_time = System::Time();
+			}
 		}
+
+//		area_f = (float) area;
+
+
 //		left_f = (float) left;
 //		right_f = (float) right;
 //		area_f = (float) area;
 //		nearest_f = (float) nearest;
 //		furthest_f = (float) furthest;
-//		print_Count(absolute_midpoint_ending_index);
+//		print_midpoints_and_edges(midpoints,midpoint_ending_index);
+
+
+
 		x = int(++x)%4;
 	}
 	return 0;
 }
-/*
+
 void print_Count(int encoder_count){
 	char a[12] = "";
 
@@ -322,7 +477,7 @@ void print_Count(int encoder_count){
 	LCDwriter -> WriteString(a);
 	LCDconsole-> Clear(0);
 }
-
+/*
 void print_State(STATE state){
 	if(state == TJunction){
 		printvalue("TJunction");
@@ -597,7 +752,7 @@ void current_position_PD(float& P, float& D, int k){
 	}
 }
 */
-void print_midpoints_and_edges(int midpoints[HEIGHT],int ending_index){
+void print_midpoints_and_edges(int8_t midpoints[HEIGHT],int8_t ending_index){
 	bool img[HEIGHT][WIDTH];
 	for(int i=0 ; i<HEIGHT; i++){
 		for(int j=0; j<WIDTH; j++){
