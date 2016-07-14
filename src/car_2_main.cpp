@@ -109,7 +109,7 @@ int main(void)
 			Led4->SetEnable(x%4 == 3);
 
 			// ticks one
-			if((int32_t)(current_time - past_time) >= 0 && !jobsdone[0] && jobsdone[1]){
+			if((int32_t)(current_time - past_time) >= 0 && !jobsdone[0] && !jobsdone[1] && jobsdone[2]){
 				past_time = current_time;
 
 				int16_t TCount = 0;
@@ -185,7 +185,7 @@ int main(void)
 		}
 
 		// ticks two
-		if((int32_t)(current_time - past_time1) >= 5 && jobsdone[0] && !jobsdone[1]){
+		if((int32_t)(current_time - past_time1) >= 5 && jobsdone[0] && !jobsdone[1] && !jobsdone[2]){
 			past_time1 = current_time;
 
 			float Kd = 0.008f;
