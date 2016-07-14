@@ -188,22 +188,28 @@ void RunMode::print_case(CamHandler::Case routecase){
 	}
 }
 
-void RunMode::update_Usensor(){
-	USsensor.Stop();
-	USsensor.Start();
+
+void RunMode::print_commend(ChaseMethod::Command command){
+	switch(command){
+	case 0:
+		printvalue("noAction");
+		break;
+	case 1:
+		printvalue("shiftRole");
+		break;
+	case 2:
+		printvalue("traingleForward");
+		break;
+	case 3:
+		printvalue("straightPass");
+		break;
+	case 4:
+		printvalue("stopCar");
+		break;
+	default:
+		printvalue("error");
+		break;
+	}
 }
 
-bool RunMode::checkUSensor(){
 
-	if(USsensor.IsAvailable()){
-		objDistance = USsensor.GetDistance();
-		sensorWorked = true;
-	}
-	else {
-		objDistance = 0;
-		sensorWorked = false;
-
-	}
-
-	return sensorWorked;
-}

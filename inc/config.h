@@ -21,8 +21,6 @@
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
 #include <libsc/dir_motor.h>
-#include <libsc/k60/jy_mcu_bt_106.h>
-#include <libsc/us_100.h>
 
 using namespace libsc;
 
@@ -167,8 +165,3 @@ k60::Ov7725::Config GetCameraConfig(){
 	return camcfg;
 }
 
-Us100::Config GetUS100Config(){
-	Us100::Config Uscfg;
-	Uscfg.id = 1;
-	return Uscfg;
-}

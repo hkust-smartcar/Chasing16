@@ -25,8 +25,7 @@
 #include <cstring>
 #include <sstream>
 #include <functional>
-#include <libsc/us_100.h>
-#include <libsc/k60/jy_mcu_bt_106.h>
+
 
 
 //
@@ -34,7 +33,6 @@
 class Car{
 public:
 	Car();
-	Car(libsc::k60::JyMcuBt106::Config cfg , bool isHC06);
 	~Car();
 
 	/*--------------------------------printing below------------------------------------*/
@@ -98,11 +96,9 @@ private:
 	Byte data[600];
 	int16_t image_size;
 	char haha[30];
-	libsc::k60::JyMcuBt106::Config Bluetooth;
 protected:
-	libsc::k60::JyMcuBt106* hc06 = nullptr;
-	libsc::k60::JyMcuBt106* hc12 = nullptr;
-	libsc::Us100 USsensor;
+
+
 	libsc::Led Led1;
 	libsc::Led Led2;
 	libsc::Led Led3;

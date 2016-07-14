@@ -25,8 +25,7 @@ Car::Car():
 	joystick(GetJoystickConfig()),
 	LCD(GetLcdConfig()),
 	buzzer(GetBuzzerConfig()),
-	LCDwriter(GetLcdWriterConfig(&LCD)),
-	USsensor(GetUS100Config())
+	LCDwriter(GetLcdWriterConfig(&LCD))
 	{
 
 	cam.Start();
@@ -40,33 +39,6 @@ Car::Car():
 	/***********************************variable below**********************************/
 	image_size = cam.GetH() * cam.GetW() / 8;
 }
-
-Car::Car(libsc::k60::JyMcuBt106::Config cfg , bool isHC06):
-		cam(GetCameraConfig()),
-		Led1(GetLed1Config()),
-		Led2(GetLed2Config()),
-		Led3(GetLed3Config()),
-		Led4(GetLed4Config()),
-		encoder(GetAbEncoderConfig()),
-		servo(GetServoConfig()),
-		motor(GetDirmotorConfig()),
-		button1(GetButton1Config()),
-		button2(GetButton2Config()),
-		joystick(GetJoystickConfig()),
-		LCD(GetLcdConfig()),
-		buzzer(GetBuzzerConfig()),
-		LCDwriter(GetLcdWriterConfig(&LCD)),
-		USsensor(GetUS100Config())
-		{
-	if(isHC06){
-		hc06 = new libsc::k60::JyMcuBt106(cfg);
-	}
-	else{
-		hc12 = new libsc::k60::JyMcuBt106(cfg);
-	}
-	cam.Start();
-	image_size = cam.GetH() * cam.GetW() / 8;
-	}
 
 Car::~Car(){
 	cam.Stop();

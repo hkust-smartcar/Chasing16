@@ -8,6 +8,7 @@
 #pragma once
 #include "car.h"
 #include "cameraDataHandler.h"
+#include "chase_method.h"
 #include <array>
 #define WHITE 1
 #define BLACK 0
@@ -28,14 +29,13 @@ public:
 	void servo_control(int16_t degree); //-90 to 90
 
 	void print_case(CamHandler::Case routecase);
+	void print_commend(ChaseMethod::Command command);
 
 	void update_encoder();
 
 	int32_t get_encoder_count();
 
-	void update_Usensor();
-	bool checkUSensor();
-	uint16_t getFrontObjDistance(){return objDistance;}
+
 
 	/* motor PID */
 	int32_t motor_speed_buff = 0, ideal_motor_speed = 0;
@@ -65,9 +65,6 @@ public:
 	/* motor control */
 	int16_t straight_counter =0;
 	uint16_t buff_speed = 0;
-	/* Usensor */
-	uint16_t objDistance = 0;
-	bool sensorWorked = false;
 
 private: //yes, I add these variable as private, because they are not important
 	// Moreover, variable can be declare in header(.h), and define in either header(.h) or source(.cpp)
