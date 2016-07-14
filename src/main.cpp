@@ -161,8 +161,6 @@ int main(void)
 			command = ChasingCar.getCommand();
 			Run.print_commend(command);
 			ChasingCar.sendCommand(command);
-			ChasingCar.motorControl();
-			speed += 1;
 		}
 	}
 

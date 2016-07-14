@@ -16,8 +16,9 @@ ChaseMethod::ChaseMethod():
 	HC12(getBluetoothConfig(0)),
 	USsensor(getUS100Config(1))
 {
-	distance_kp = 0;
+	distance_kp = 1;
 	distance_kd = 0;
+	idealDistance = 500;
 	role = solo;
 	if (!m_instance)
 		m_instance = this;
@@ -27,8 +28,9 @@ ChaseMethod::ChaseMethod(Role carRole,uint8_t Hc12_id,uint8_t Usensor_id ,int16_
 		HC12(getBluetoothConfig(Hc12_id)),
 		USsensor(getUS100Config(Usensor_id))
 {
-	distance_kp = 0;
+	distance_kp = 1;
 	distance_kd = 0;
+	idealDistance = 500;
 	role = carRole;
 	motorSpeed = speed;
 	if (!m_instance)
@@ -55,11 +57,23 @@ Us100::Config ChaseMethod::getUS100Config(uint8_t id){
 	return Uscfg;
 }
 
-void ChaseMethod::motorControl(){
+int16_t ChaseMethod::distanceControl(){
 	distanceErrorPrev = distanceError;
-	if(objDistance >0 && objDistance < 800)distanceError = 500 -objDistance;
-	else if(objDistance == 0)
+	if(objDistance >0 && objDistance < 800)distanceError = idealDistance -objDistance;
+	else if(objDistance == 65535) distanceError = idealDistance;
 	distancePIDOutput = distance_kp*distanceError + distance_kd*(distanceErrorPrev-distanceError);
+	if(objDistance <200) distancePIDOutput = TOO_CLOSE_FROM_FRONT_CAR;
+	return distancePIDOutput;
+}
+
+void ChaseMethod::excuteCommand(){
+	if(command == shiftRole) {
+		if(role == leader) role = follower;
+		else role = leader;
+	}
+	else if (command == stopCar) motorSpeed = 0;
+
+	// not action for other,
 }
 
 ChaseMethod::Command ChaseMethod::getCommand(){

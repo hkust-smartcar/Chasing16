@@ -6,6 +6,8 @@
 using namespace libsc;
 using namespace libsc::k60;
 
+#define TOO_CLOSE_FROM_FRONT_CAR -32760
+
 class ChaseMethod{
 public:
 	enum Role{
@@ -18,13 +20,19 @@ public:
 	ChaseMethod();
 	ChaseMethod(Role carRole,uint8_t Hc12_id,uint8_t Usensor_id ,int16_t* speed);
 	~ChaseMethod();
+	Role getCurrentRole(){ return role;}
 
+	/* Bluetooth */
 	Command getCommand();	// get the command from other car
+	Command getPreviousCommand(){ return command;}
 	void sendCommand(ChaseMethod::Command);		// send command to all channel
+	void excuteCommand();
+
+	/* Usensor */
 	void update_Usensor();	//re-shoot unltra sonic wave
 	bool checkUSensor();
 	uint16_t getFrontObjDistance(){return objDistance;}
-	void motorControl();
+	int16_t distanceControl();
 
 
 
@@ -44,8 +52,8 @@ protected:
 	uint16_t objDistance = 65535;
 	bool sensorWorked = false;
 	int16_t* motorSpeed ;
-	int16_t distanceError = 0, distanceErrorPrev = 0, distancePIDOutput = 0;
-	float distance_kp, distance_kd, idealDistance;
-	int16_t tooCloseCounter = 0;
+	int16_t distanceError = 0, distanceErrorPrev = 0, distancePIDOutput = 0, idealDistance;
+	float distance_kp, distance_kd;
+
 
 };
