@@ -59,22 +59,19 @@ Us100::Config ChaseMethod::getUS100Config(uint8_t id){
 
 int16_t ChaseMethod::distanceControl(){
 	distanceErrorPrev = distanceError;
+
 	if(objDistance >0 && objDistance < 800)distanceError = idealDistance -objDistance;
-	else if(objDistance == 65535) distanceError = idealDistance;
+	else distanceError = idealDistance;
+	// take  0 < distance <800 as a legal distance to pass into distance PID
+
 	distancePIDOutput = distance_kp*distanceError + distance_kd*(distanceErrorPrev-distanceError);
+
 	if(objDistance <200) distancePIDOutput = TOO_CLOSE_FROM_FRONT_CAR;
+
 	return distancePIDOutput;
 }
 
-void ChaseMethod::excuteCommand(){
-	if(command == shiftRole) {
-		if(role == leader) role = follower;
-		else role = leader;
-	}
-	else if (command == stopCar) motorSpeed = 0;
 
-	// not action for other,
-}
 
 ChaseMethod::Command ChaseMethod::getCommand(){
 
@@ -93,6 +90,15 @@ ChaseMethod::Command ChaseMethod::getCommand(){
 		break;
 	case '5':
 		command = stopCar;
+		break;
+	case '6':
+		command = leftTurn;
+		break;
+	case '7':
+		command = rightTurn;
+		break;
+	case '8':
+		command = confirmShift;
 		break;
 	default:
 		command = error;
@@ -120,8 +126,17 @@ void ChaseMethod::sendCommand(ChaseMethod::Command DataSend){
 		case stopCar:
 			HC12.SendStr("5");
 			break;
-		default:
+		case leftTurn:
 			HC12.SendStr("6");
+			break;
+		case rightTurn:
+			HC12.SendStr("7");
+			break;
+		case confirmShift:
+			HC12.SendStr("8");
+			break;
+		default:
+			HC12.SendStr("9");
 			break;
 		}
 }
@@ -139,9 +154,7 @@ bool ChaseMethod::checkUSensor(){
 		sensorWorked = true;
 	}
 	else {
-		objDistance = 65535;
 		sensorWorked = false;
-
 	}
 
 	return sensorWorked;

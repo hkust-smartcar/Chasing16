@@ -1,0 +1,63 @@
+
+variable:
+int16_t speedBuffer = 0;
+bool bufferUpdated = false;
+int16_t speed = 0;
+ChaseMethod ChasingCar(ChaseMethod::Role::follower, 0 ,1, &speed);
+ChaseMethod::Command commandToSend = ChaseMethod::Command::noAction;
+ChaseMethod::Command commandReceived = ChaseMethod::Command::noAction;
+
+Ticks one:  check if unltrasonic sensor is available, if so, get this value
+
+
+if((int32_t)(current_time - past_time) >= 1){
+	past_time = current_time;
+	
+	if(ChasingCar.checkUSensor()) {
+		speedBuffer = ChasingCar.distanceControl();	
+		ChasingCar.update_Usensor()
+		bufferUpdated = true;
+	}
+}
+
+
+Ticks two:	check is ultrasonic distance buffer is updated, if so, speed control
+
+if((int32_t)(current_time - past_time) >= 15){
+	past_time = current_time;
+	if(bufferUpdated) {
+		//motorPID here, the value of distance PID has been add into the speed buffer.
+		
+		bufferUpdated = false;
+	}
+}
+
+
+Ticks three:	send / get command base on the role 
+
+if((int32_t)(current_time - past_time) >= 20){
+	past_time = current_time;
+	
+	if(ChasingCar.getCurrentRole() == leader) {
+		ChasingCar.sendCommand(commandToSend);
+		if(commandToSend == ChaseMethod::Command::shiftRole){
+		ChasingCar.roleShift(ChaseMethod::Role::shifter);
+	}
+	
+	else if(ChasingCar.getCurrentRole() == follower){
+		commandReceived = ChasingCar.getCommand();
+		if(commandToSend == ChaseMethod::Command::shiftRole){
+			
+		}
+	}
+	
+	else if(ChasingCar.getCurrentRole() == shifter){
+		ChasingCar.sendCommand(ChaseMethod::Command::shiftRole);
+		commandReceived = ChasingCar.getCommand();
+		
+		if(commandReceived == ChaseMethod::Command::confirmShift){
+			ChasingCar.roleShift(ChaseMethod::Role::follower;
+		}	
+	}
+	
+}

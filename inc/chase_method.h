@@ -11,22 +11,25 @@ using namespace libsc::k60;
 class ChaseMethod{
 public:
 	enum Role{
-		leader = 0, follower, solo
+		leader = 0, follower, shifter , solo
 	};
+	//leader is the car in the front, and it will send command for the car behind to execute,
+	//for follower, it will look for command from the front car
+	//shifter if the previous leader, but sent shiftRole command. I will wait for a confirm message from the new leader before it become a follower
 	enum Command{
-		noAction = 0, shiftRole, traingleForward , straightPass, stopCar, error
+		noAction = 0, shiftRole, traingleForward, straightPass, stopCar, leftTurn, rightTurn,confirmShift ,error
 	};
 
 	ChaseMethod();
 	ChaseMethod(Role carRole,uint8_t Hc12_id,uint8_t Usensor_id ,int16_t* speed);
 	~ChaseMethod();
 	Role getCurrentRole(){ return role;}
+	void roleShift(Role myRole){ role = myRole;}
 
 	/* Bluetooth */
 	Command getCommand();	// get the command from other car
 	Command getPreviousCommand(){ return command;}
 	void sendCommand(ChaseMethod::Command);		// send command to all channel
-	void excuteCommand();
 
 	/* Usensor */
 	void update_Usensor();	//re-shoot unltra sonic wave
