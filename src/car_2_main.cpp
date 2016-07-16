@@ -192,7 +192,7 @@ int main(void)
 				//				count = 190;
 				//			}
 
-				count = 360;
+				count = 320;
 
 				int32_t ideal_servo_degree = uint16_t(1000 + P*Runner.ServoErr + D*(Runner.ServoErr - Runner.ServoPrevErr));
 				Runner.ServoPrevErr = Runner.ServoErr;
@@ -218,7 +218,7 @@ int main(void)
 
 			Runner.MotorPrev2Err = Runner.MotorPrev1Err;
 			Runner.MotorPrev1Err = Runner.MotorErr;
-			motor->SetClockwise(1);
+			motor->SetClockwise(0);
 			//		motor->SetPower((Runner.ideal_motor_speed - 434.43)/(2.7824) + 196);	//Transformation from count to motor speed
 			motor->SetPower(Runner.ideal_motor_speed);
 
