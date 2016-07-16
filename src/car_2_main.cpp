@@ -4,7 +4,6 @@
 #include <functional>
 #include <libsc/led.h>
 #include <libbase/k60/mcg.h>
-#include <libsc/dir_encoder.h>
 #include <libsc/ab_encoder.h>
 #include <libsc/trs_d05.h>
 #include <libsc/futaba_s3010.h>
@@ -62,7 +61,7 @@ libsc::Led* Led1 = nullptr;
 libsc::Led* Led2 = nullptr;
 libsc::Led* Led3 = nullptr;
 libsc::Led* Led4 = nullptr;
-libsc::DirEncoder* encoder = nullptr;
+libsc::AbEncoder* encoder = nullptr;
 libsc::FutabaS3010* servo = nullptr;
 libsc::DirMotor* motor = nullptr;
 libsc::St7735r* LCD = nullptr;
@@ -115,6 +114,7 @@ int main(void)
 	Timer::TimerInt triangle_time = 0;
 	Timer::TimerInt past_time = 0, past_time1 = 0, past_time2 = 0, past_time3 = 0, past_time4 = 0, past_time5 = 0;
 	int8_t x = 1;
+	Config_all();
 
 	bool triangle_detector_1 = false, triangle_detector_2 = false, triangle_detector_3 = false;
 	bool triangle = false, reached_triangle = false;
@@ -126,14 +126,10 @@ int main(void)
 
 		if(current_time !=System::Time()){
 			current_time = System::Time();
-
-			Led1->SetEnable(x%4 == 0);
-			Led2->SetEnable(x%4 == 1);
-			Led3->SetEnable(x%4 == 2);
-			Led4->SetEnable(x%4 == 3);
+		}
 
 			// ticks one
-			if((int32_t)(current_time - past_time) >= 0 && !jobsdone[0] && !jobsdone[1] && jobsdone[2]){
+			if((int32_t)(current_time - past_time) >= 0 && !jobsdone[0]){
 				past_time = current_time;
 
 				int16_t TCount = 0;
@@ -202,14 +198,13 @@ int main(void)
 				Runner.ServoPrevErr = Runner.ServoErr;
 				Runner.ServoPrev1Err = Runner.ServoPrevErr;
 				servo->SetDegree(servo_cap_ome(ideal_servo_degree));
-
+				jobsdone[0] = true;
 			}
 
-			jobsdone[0] = true;
-		}
+
 
 		// ticks two
-		if((int32_t)(current_time - past_time1) >= 5 && jobsdone[0] && !jobsdone[1] && !jobsdone[2]){
+		if((int32_t)(current_time - past_time1) >= 5 && jobsdone[0]){
 			past_time1 = current_time;
 
 			float Kd = 0.008f;
@@ -231,7 +226,7 @@ int main(void)
 		}
 
 		// ticks three
-		if((int32_t)(current_time - past_time2) >= 6 && jobsdone[0] && jobsdone[1] && !jobsdone[2]){
+		if((int32_t)(current_time - past_time2) >= 6 && jobsdone[0]){
 			past_time2 = current_time;
 
 			absolute_midpoint_ending_index = 0;
@@ -306,9 +301,6 @@ int main(void)
 		if((int32_t)(current_time - past_time3) >= 1){
 			past_time3 = current_time;
 
-
-
-
 			jobsdone[3] = true;
 		}
 
@@ -318,12 +310,10 @@ int main(void)
 
 
 		//to give condition for ticks, like  below, ticks 1 and 2 must both excute once before any of them run second time
-		if(jobsdone[0] == true && jobsdone[1] == true){
+		if(jobsdone[0] == true && jobsdone[2] == true){
 			jobsdone[0] = false;
-			jobsdone[1] = false;
+			jobsdone[2] = false;
 		}
-
-		x = int(++x)%4;
 	}
 	return 0;
 }
@@ -355,9 +345,9 @@ void Config_all(){
 	Led4Config.is_active_low = true;
 	Led4 = new Led(Led4Config);
 
-	DirEncoder::Config EncoderConfig;
+	AbEncoder::Config EncoderConfig;
 	EncoderConfig.id = 0;
-	encoder = new DirEncoder(EncoderConfig);
+	encoder = new AbEncoder(EncoderConfig);
 	//
 	FutabaS3010::Config ServoConfig;
 	ServoConfig.id = 0;
