@@ -173,7 +173,7 @@ int main(){
 	//PGrapher: Share and Watch Variables
 //	pGrapher Grapher;
 
-	float Kp = 0, Ki = 0, Kd = 0;
+//	float Kp = 0, Ki = 0, Kd = 0;
 
 //	Grapher.addSharedVar(&Kp,"Motor PID Kp");
 //	Grapher.addSharedVar(&Ki,"Motor PID Ki");
