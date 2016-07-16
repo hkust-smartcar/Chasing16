@@ -34,7 +34,7 @@ int main(void)
 	Timer::TimerInt past_time = 0, past_time2 = 0, past_time3 = 0, past_time4 = 0, past_time5 = 0;
 	bool UsensorIsReady = false;
 	uint16_t distance = 0;
-	ChaseMethod::Command command;
+	ChaseMethod::Command command = ChaseMethod::Command::noAction;
 //	char haha[30];
 //	while(1);
 //code for ploting graph for a equation of y = mx +c, where y and x are encoder counting or motor PWM
@@ -154,14 +154,15 @@ int main(void)
 			past_time4 = current_time;
 			if(ChasingCar.checkUSensor()) UsensorIsReady = false;
 			distance = ChasingCar.getFrontObjDistance();
+			Run.printvalue(distance,0xFFFF);
 		}
 
-		if((int32_t)(current_time - past_time5) >= 40 ){
-			past_time5 = current_time;
-			command = ChasingCar.getCommand();
-			Run.print_commend(command);
-			ChasingCar.sendCommand(command);
-		}
+//		if((int32_t)(current_time - past_time5) >= 40 ){
+//			past_time5 = current_time;
+//			command = ChasingCar.getCommand();
+//			Run.print_commend(command);
+//			ChasingCar.sendCommand(command);
+//		}
 	}
 
 

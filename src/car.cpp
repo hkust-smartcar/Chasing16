@@ -46,7 +46,7 @@ Car::~Car(){
 
 void Car::printvalue(int32_t value, uint16_t color){
 	LCD.SetRegion(libsc::Lcd::Rect(0,0,128,40));
-	sprintf(haha,"error %I32d", value);
+	sprintf(haha,"%d", value);
 	LCDwriter.SetTextColor(color);
 	LCDwriter.WriteString(haha);
 }
