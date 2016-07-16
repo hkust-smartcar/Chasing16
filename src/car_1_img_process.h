@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 using namespace std;
 const int WIDTH = 80;
@@ -142,7 +143,7 @@ void regression_line(int8_t midpoints[HEIGHT],int starting_index, int ending_ind
 }
 
 
-/*
+
 int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column){
 	if(image[HEIGHT - 1][column] == 0){return 0;} //Only continue if point of last (nearest) line is white
 	int horizontal_length = 0, vertical_length = 0, area = 0, vertical_index = 0, distance = 0, left = 0, right = 0; //Value to be used
@@ -214,8 +215,8 @@ int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int col
 
 	return 0;   //Not triangle
 }
-*/
-/*
+
+
 void check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column, int& left, int& right, int& area, int& nearest, int& furthest){
 	if(image[HEIGHT - 1][column] == 0){return;} //Only continue if point of last (nearest) line is white
 	int horizontal_length = 0, vertical_length = 0, vertical_index = 0, left_mid_point = 0, right_mid_point = 0; //Value to be used
@@ -284,7 +285,7 @@ void check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int co
 	}
 //	return ;
 }
-*/
+
 int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column){
 	if(image[HEIGHT - 1][column] == 0){return 0;} //Only continue if point of last (nearest) line is white
 	int horizontal_length = 0, vertical_length = 0, vertical_index = 0, left_mid_point = 0, right_mid_point = 0; //Value to be used
@@ -439,3 +440,4 @@ int average_midpoint_error(const int8_t midpoints[HEIGHT],int starting_index, in
 	sum /= (starting_index - ending_index + 1);
 	return (sum-WIDTH/2);
 }
+*/

@@ -1,9 +1,34 @@
-#include <cassert>
-#include <cstring>
+/*
+
+
+#include <iostream>
+#include <libutil/looper.h>
 #include <libsc/system.h>
-#include <stdint.h>
-#include "img_process_compilation.h"
+#include <functional>
+#include <libsc/led.h>
+#include <libbase/k60/mcg.h>
+#include <libsc/dir_encoder.h>
+#include <libsc/ab_encoder.h>
+#include <libsc/futaba_s3010.h>
+#include <libsc/k60/ov7725.h>
+#include <libsc/button.h>
+#include <libsc/joystick.h>
+#include <libsc/st7735r.h>
+#include <libsc/simple_buzzer.h>
+#include <libsc/battery_meter.h>
+#include <libsc/lcd_console.h>
+#include <libsc/lcd_typewriter.h>
+#include <libsc/dir_motor.h>
+#include <libsc/k60/jy_mcu_bt_106.h>
+#include <array>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include "libsc/lcd.h"
 #include <cmath>
+#include <math.h>
+#include <libutil/pGrapher.h>
+#include "car_1_img_process.h"
 
 
 using namespace libsc;
@@ -355,7 +380,7 @@ void Config_all(){
 	camcfg.w = WIDTH;
 	camcfg.h = HEIGHT;
 	camcfg.fps=k60::Ov7725::Config::Fps::kHigh;
-	//TODO adjust appropriate FPS
+
 	//	camcfg.contrast = 0x30;
 	cam = new k60::Ov7725(camcfg);
 	cam->Start();
@@ -459,3 +484,4 @@ void print_midpoints_and_edges(int8_t midpoints[HEIGHT],int8_t ending_index){
 	print2DCam(10, 10, img);
 }
 
+*/

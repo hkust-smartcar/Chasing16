@@ -1,3 +1,4 @@
+/*
 #include <iostream>
 #include <libutil/looper.h>
 #include <libsc/system.h>
@@ -6,14 +7,12 @@
 #include <libbase/k60/mcg.h>
 #include <libsc/dir_encoder.h>
 #include <libsc/ab_encoder.h>
-#include <libsc/trs_d05.h>
 #include <libsc/futaba_s3010.h>
 #include <libsc/k60/ov7725.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
 #include <libsc/st7735r.h>
 #include <libsc/simple_buzzer.h>
-#include <libsc/alternate_motor.h>
 #include <libsc/battery_meter.h>
 #include <libsc/lcd_console.h>
 #include <libsc/lcd_typewriter.h>
@@ -24,10 +23,10 @@
 #include <sstream>
 #include <string>
 #include "libsc/lcd.h"
-#include "img_process_compilation.h"
 #include <cmath>
 #include <math.h>
 #include <libutil/pGrapher.h>
+#include "car_1_img_process.h"
 
 #define data_size (WIDTH * HEIGHT / 8)
 
@@ -133,7 +132,7 @@ int main(){
 	RunMode Runner;
 
 	//CoolTerm: Return encoder count
-/*
+
 		k60::JyMcuBt106::Config config;
 		config.id = 1;
 		config.baud_rate = libbase::k60::Uart::Config::BaudRate::k115200;
@@ -154,7 +153,7 @@ int main(){
 			if (motor_speed > 500) {motor->SetPower(0);while(1);}
 			System::DelayMs(20);
 		}
-*/
+
 //	float state = 0;
 
 //	float test_coef_1 = 0.0f; float test_coef_2 = 0.0f; double test_grad = 1; double test_grad_1 = 1;
@@ -178,10 +177,10 @@ int main(){
 //	Grapher.addSharedVar(&Kp,"Motor PID Kp");
 //	Grapher.addSharedVar(&Ki,"Motor PID Ki");
 //	Grapher.addSharedVar(&Kd,"Motor PID Kd");
-/*
+
 	float angle_1 = 0; float angle_2 = 0; float angle_3 = 0; float angle_4 = 0;float separating_index_f = 0.0f;
 	float mid_point_index_f = 0;
-*/
+
 //	float is_triangle = 0.0f;
 
 //	Grapher.addWatchedVar(&is_triangle, "Check Triangle");
@@ -477,7 +476,7 @@ void print_Count(int encoder_count){
 	LCDwriter -> WriteString(a);
 	LCDconsole-> Clear(0);
 }
-/*
+
 void print_State(STATE state){
 	if(state == TJunction){
 		printvalue("TJunction");
@@ -495,7 +494,7 @@ void print_State(STATE state){
 		printvalue("GoStraight");
 	}
 }
-*/
+
 
 void Config_all(){
 
@@ -570,7 +569,7 @@ void Config_all(){
 
 }
 
-/*
+
 
 void printvalue(std::string Result) {
 	LCD->SetRegion(libsc::Lcd::Rect(0, 0, 128, 40));
@@ -583,7 +582,7 @@ void printvalue(int x, int y, int w, int h, std::string Result) {
 	const char *s = Result.c_str();
 	LCDwriter->WriteString(s);
 }
-*/
+
 void printRawCamGraph(const int8_t x, const int8_t y, Byte* data) {
 	LCD->SetRegion(Lcd::Rect(x, y, 80, 60));
 	LCD->FillBits(0, 0xFFFF, data, 80 * 60);
@@ -718,7 +717,7 @@ void capture_image(void) {
 //
 //}
 
-/*
+
 void current_position_PD(float& P, float& D, int k){
 	// P-D values for current_position()
 
@@ -751,7 +750,7 @@ void current_position_PD(float& P, float& D, int k){
 		D = 0;
 	}
 }
-*/
+
 void print_midpoints_and_edges(int8_t midpoints[HEIGHT],int8_t ending_index){
 	bool img[HEIGHT][WIDTH];
 	for(int i=0 ; i<HEIGHT; i++){
@@ -772,3 +771,4 @@ void print_midpoints_and_edges(int8_t midpoints[HEIGHT],int8_t ending_index){
 	//	}
 	print2DCam(10, 10, img);
 }
+*/
