@@ -1,3 +1,4 @@
+
 #include <iostream>
 using namespace std;
 const int WIDTH = 80;
@@ -5,8 +6,8 @@ const int HEIGHT = 60;
 const float PI = 3.142;
 enum STATE {TurnRight, TurnLeft, GoStraight, TJunction, SPath, Triangle, OvertakeZone};
 int servo_cap(int servo_angle){
-	if(servo_angle > 1200){
-		return 1200;
+	if(servo_angle > 1300){
+		return 1300;
 	}
 	if(servo_angle < 500){
 		return 500;
@@ -15,8 +16,8 @@ int servo_cap(int servo_angle){
 }
 
 int servo_cap_ome(int servo_angle){
-	if(servo_angle > 1400){
-		return 1400;
+	if(servo_angle > 1350){
+		return 1350;
 	}
 	if(servo_angle < 650){
 		return 650;
@@ -285,7 +286,7 @@ void check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int co
 //	return ;
 }
 */
-int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column){
+int check_triangle1(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column){
 	if(image[HEIGHT - 1][column] == 0){return 0;} //Only continue if point of last (nearest) line is white
 	int horizontal_length = 0, vertical_length = 0, vertical_index = 0, left_mid_point = 0, right_mid_point = 0; //Value to be used
 	int area = 0, left = 0, right = 0, nearest = 0, furthest = 0;
@@ -300,7 +301,7 @@ int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int col
 
 	k = starting_black - ending_black + 1; //Length of white line
 
-	if(k > 0 && k < 30){ //FIRST CONDITION TO ENTER THIS COMPLICATED SHIT (Length of first white line is within a certain range)
+	if(k > 0 && k < 25){ //FIRST CONDITION TO ENTER THIS COMPLICATED SHIT (Length of first white line is within a certain range)
 		horizontal_length++;
 		area = k;
 		vertical_length = k;
@@ -356,37 +357,109 @@ int check_triangle(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int col
 	return 0;
 }
 
+int check_triangle2(bool image[HEIGHT][WIDTH], int midpoint_ending_index, int column){
+	if(image[HEIGHT - 1][column] == 0){return 0;} //Only continue if point of last (nearest) line is white
+	int horizontal_length = 0, vertical_length = 0, vertical_index = 0, left_mid_point = 0, right_mid_point = 0; //Value to be used
+	int area = 0, left = 0, right = 0, nearest = 0, furthest = 0;
+	int starting_black = HEIGHT - 1, ending_black = midpoint_ending_index;
+	int k = 0;
+	if(image[midpoint_ending_index][column] == 0){
+		for(; ending_black < HEIGHT - 1 && image[ending_black][column] == 0; ending_black++); //Find first white point for ending_black
+	}
+	//Find edge of vertical while line
+	for(; starting_black > midpoint_ending_index - 1  && image[starting_black][column] == 1; starting_black--); starting_black++;
+	for(; ending_black < HEIGHT - 1 && image[ending_black][column] == 1; ending_black++); ending_black--;
+
+	k = starting_black - ending_black + 1; //Length of white line
+
+	if(k > 0 && k < 21){ //FIRST CONDITION TO ENTER THIS COMPLICATED SHIT (Length of first white line is within a certain range)
+		horizontal_length++;
+		area = k;
+		vertical_length = k;
+		vertical_index = column;
+		nearest = starting_black;
+		furthest = ending_black;
+		left_mid_point = double(0.5*(starting_black + ending_black)) + 0.5;
+		right_mid_point = left_mid_point;
+
+		for(left = column - 1; left >= 0 && image[left_mid_point][left] == 0; left --, left_mid_point = double(0.5*(starting_black + ending_black)) + 0.5){
+			for(starting_black = left_mid_point; starting_black < HEIGHT - 1 && image[starting_black][column] == 0; starting_black++); starting_black--;
+			for(ending_black = left_mid_point; ending_black > midpoint_ending_index - 1 && image[ending_black][column] == 0; ending_black--); ending_black++;
+			k = starting_black - ending_black + 1;
+			if(k < 1 || k > 21){break;}
+			horizontal_length++;
+			area += k;
+			if(k > vertical_length){
+				vertical_length = k;
+				vertical_index = left;
+			}
+			if(starting_black > nearest){
+				nearest = starting_black;
+			}
+			if(ending_black < furthest){
+				furthest = ending_black;
+			}
+		}
+		if(left < 2){return 0;}
+		for(right = column + 1; right < WIDTH && image[right_mid_point][right] == 0; right ++, right_mid_point = double(0.5*(starting_black + ending_black)) + 0.5){
+			for(starting_black = right_mid_point; starting_black < HEIGHT - 1 && image[starting_black][column] == 0; starting_black++); starting_black--;
+			for(ending_black = right_mid_point ; ending_black > midpoint_ending_index - 1 && image[ending_black][column] == 0; ending_black--); ending_black++;
+			k = starting_black - ending_black + 1;
+			if(k < 1 || k > 21){break;}
+			horizontal_length++;
+			area += k;
+			if(k > vertical_length){
+				vertical_length = k;
+				vertical_index = right;
+			}
+			if(starting_black > nearest){
+				nearest = starting_black;
+			}
+			if(ending_black < furthest){
+				furthest = ending_black;
+			}
+		}
+		if(nearest - furthest > 25){return 0;}
+		if(right > WIDTH - 3){return 0;}
+		if(horizontal_length > 26 || horizontal_length < 4){return 0;}
+		if (area > 400){return 0;}
+		return area;
+	}
+	return 0;
+}
+
 
 
 
 STATE determine_state(int8_t midpoints[HEIGHT], int midpoint_ending_index, int absolute_midpoint_endnig_index, int TCount, int WCount,int separating_index, bool overtake_possible, bool triangle, bool reached_triangle){
-	// 0. test whether it is a triangle;
-//	if(triangle && !reached_triangle){
-//		reached_triangle = true;
-//		return Triangle;
-//	}
+//	 0. test whether it is a triangle;
+	if(triangle && !reached_triangle){
+		reached_triangle = true;
+		return Triangle;
+	}
+
 
 	// 1. test whether it is an OvertakeZone:
 	double gradient = 0; double gradient1 = 0; double gradient2 = 0; double gradient3 = 0; float coef = 1; int a = 0; int b = 0; int c = 0; int d = 0;
-	if(overtake_possible){
-		regression_line(midpoints,HEIGHT-1,(separating_index + HEIGHT)/2,gradient);
-		regression_line(midpoints,(separating_index + HEIGHT)/2 -1 ,separating_index,gradient1);
-		regression_line(midpoints,separating_index-1,(midpoint_ending_index + separating_index-1)/2,gradient2);
-		regression_line(midpoints,(midpoint_ending_index + separating_index-1)/2 - 1,midpoint_ending_index,gradient3);
-
-		double test_grad = 0;
-		regression_line(midpoints,HEIGHT-1,separating_index,test_grad);
-
-		test_grad = (int((180*atan(test_grad)/PI)+180)%180);
-		a = (int((180*atan(gradient)/PI)+180)%180);
-		b = (int((180*atan(gradient1)/PI)+180)%180);
-		c = (int((180*atan(gradient2)/PI)+180)%180);
-		d = (int((180*atan(gradient3)/PI)+180)%180);
-
-		if(abs(test_grad-90) < 15 && abs(a-b) < 15 && abs(c-d) < 3){
-			return OvertakeZone;
-		}
-	}
+//	if(overtake_possible){
+//		regression_line(midpoints,HEIGHT-1,(separating_index + HEIGHT)/2,gradient);
+//		regression_line(midpoints,(separating_index + HEIGHT)/2 -1 ,separating_index,gradient1);
+//		regression_line(midpoints,separating_index-1,(midpoint_ending_index + separating_index-1)/2,gradient2);
+//		regression_line(midpoints,(midpoint_ending_index + separating_index-1)/2 - 1,midpoint_ending_index,gradient3);
+//
+//		double test_grad = 0;
+//		regression_line(midpoints,HEIGHT-1,separating_index,test_grad);
+//
+//		test_grad = (int((180*atan(test_grad)/PI)+180)%180);
+//		a = (int((180*atan(gradient)/PI)+180)%180);
+//		b = (int((180*atan(gradient1)/PI)+180)%180);
+//		c = (int((180*atan(gradient2)/PI)+180)%180);
+//		d = (int((180*atan(gradient3)/PI)+180)%180);
+//
+//		if(abs(test_grad-90) < 15 && abs(a-b) < 15 && abs(c-d) < 3){
+//			return OvertakeZone;
+//		}
+//	}
 
 	// 2. test whether it is a straight line
 	float x_mean = 0; float y_mean = 0; float xy_mean = 0; float x2_mean = 0; float y2_mean = 0;
@@ -410,7 +483,7 @@ STATE determine_state(int8_t midpoints[HEIGHT], int midpoint_ending_index, int a
 	b = (int((180*atan(gradient1)/PI)+180)%180);
 	c = (int((180*atan(gradient2)/PI)+180)%180);
 	d = (int((180*atan(gradient3)/PI)+180)%180);
-	if(abs(a-90) <= 20){
+	if(abs(a-90) <= 30){
 		if(abs(b-c) < 30 && abs(c-d) < 30 && abs(b-d) < 30){
 			return GoStraight;
 		}
@@ -418,7 +491,7 @@ STATE determine_state(int8_t midpoints[HEIGHT], int midpoint_ending_index, int a
 	}
 	// 3. test whether it is TurnLeft or TurnRight
 	else{
-		if(abs(b-c) < 15 && abs(c-d) < 15 && abs(b-d) < 15){
+		if(abs(b-c) < 10 && abs(c-d) < 10 && abs(b-d) < 10){
 			return GoStraight;
 		}
 		else if(gradient > 0 && b >= c && c >= d){
