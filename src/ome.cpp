@@ -178,7 +178,7 @@ int main(){
 	bool run = false;
 	int area = 0;
 	float encoder_count = 0.0f;
-	ChaseMethod Chase(ChaseMethod::Role::leader,0,1,&count);
+	ChaseMethod Chase(ChaseMethod::Role::follower,0,1,&count);
 	Chase.update_Usensor();
 	ChaseMethod::Command leaderCommand = ChaseMethod::Command::error;
 	ChaseMethod::Command followerCommand = ChaseMethod::Command::error;
@@ -258,10 +258,10 @@ int main(){
 		//		else{
 		Runner.current_state = determine_state(midpoints,midpoint_ending_index, absolute_midpoint_ending_index, TCount, WCount, Runner.separating_index, 0, triangle, reached_triangle);
 		//		}
-		if(Runner.current_state == Triangle){
-			motor->SetPower(0);
-			break;
-		}
+//		if(Runner.current_state == Triangle){
+//			motor->SetPower(0);
+//			break;
+//		}
 
 		//		print_State(Runner.current_state);
 		//-------------------- SERVO PID ----------------------//
@@ -302,13 +302,13 @@ int main(){
 				D = 0;
 				count = 170;
 			}
-			//			else if(Runner.current_state == Triangle){
-			//				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
+						else if(Runner.current_state == Triangle){
+							Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
+							P = 15;
 			//				P = 15;
-			////				P = 15;
-			//				D = 1;
-			//				count = 190;
-			//			}
+							D = 1;
+							count = 190;
+						}
 			//			else if(Runner.current_state == OvertakeZone){
 			//				Runner.ServoErr = -average_midpoint_error(midpoints,HEIGHT-1,midpoint_ending_index +(10/11)*(-midpoint_ending_index + HEIGHT-1));
 			//				P = 15;
@@ -480,14 +480,7 @@ int main(){
 //				ispressed = false;
 //		}
 
-		// check sensor reading, then whether control speed by distance or not
-		if(Chase.checkUSensor()){
-			obj_distance = Chase.getFrontObjDistance();
-			Chase.update_Usensor();
-			sensorUpdated = true;
-//			print_Count(obj_distance);
-		}
-		else sensorUpdated =false;
+
 
 		//check chasing command from other car
 		if(Chase.getCurrentRole() == ChaseMethod::Role::leader){
@@ -500,19 +493,27 @@ int main(){
 				Chase.sendCommand(leaderCommand);
 				}
 
-			switch(leaderCommand){
-			case(ChaseMethod::Command::traingleForward):
-				printvalue("traingleForward");
-			break;
-			case(ChaseMethod::Command::noAction):
-				printvalue("noAction");
-			break;
-			default:
-				printvalue("error");
-
-			}
+//			switch(leaderCommand){
+//			case(ChaseMethod::Command::traingleForward):
+//				printvalue("traingleForward");
+//			break;
+//			case(ChaseMethod::Command::noAction):
+//				printvalue("noAction");
+//			break;
+//			default:
+//				printvalue("error");
+//
+//			}
 		}else if (Chase.getCurrentRole() == ChaseMethod::Role::follower){
 			followerCommand = Chase.getCommand();
+			// check sensor reading, then whether control speed by distance or not
+			if(Chase.checkUSensor()){
+				obj_distance = Chase.getFrontObjDistance();
+				Chase.update_Usensor();
+				sensorUpdated = true;
+	//			print_Count(obj_distance);
+			}
+			else sensorUpdated =false;
 
 			switch(followerCommand){
 			case(ChaseMethod::Command::traingleForward):
@@ -628,36 +629,36 @@ void Config_all(){
 	LCDCConfig.region = Lcd::Rect(0,0,128,160);
 	LCDconsole = new LcdConsole(LCDCConfig);
 
-	Joystick::Config config;
-
-	config.id = 0;
-	config.is_active_low = true;
-	config.listener_triggers[0] = Joystick::Config::Trigger::kBoth;
-	config.listener_triggers[1] = Joystick::Config::Trigger::kBoth;
-	config.listener_triggers[2] = Joystick::Config::Trigger::kBoth;
-	config.listener_triggers[3] = Joystick::Config::Trigger::kBoth;
-	config.listener_triggers[4] = Joystick::Config::Trigger::kBoth;
-	config.handlers[static_cast<int>(Joystick::State::kUp)] = [&](const uint8_t, const Joystick::State)
-	{
-		COUNT++;
-	};
-	config.handlers[static_cast<int>(Joystick::State::kDown)] = [&](const uint8_t, const Joystick::State)
-	{
-
-	};
-	config.handlers[static_cast<int>(Joystick::State::kLeft)] = [&](const uint8_t, const Joystick::State)
-	{
-
-	};
-	config.handlers[static_cast<int>(Joystick::State::kRight)] = [&](const uint8_t, const Joystick::State)
-	{
-
-	};
-	config.handlers[static_cast<int>(Joystick::State::kSelect)] = [&](const uint8_t, const Joystick::State)
-	{
-
-	};
-	joystick = new Joystick(config);
+//	Joystick::Config config;
+//
+//	config.id = 0;
+//	config.is_active_low = true;
+//	config.listener_triggers[0] = Joystick::Config::Trigger::kBoth;
+//	config.listener_triggers[1] = Joystick::Config::Trigger::kBoth;
+//	config.listener_triggers[2] = Joystick::Config::Trigger::kBoth;
+//	config.listener_triggers[3] = Joystick::Config::Trigger::kBoth;
+//	config.listener_triggers[4] = Joystick::Config::Trigger::kBoth;
+//	config.handlers[static_cast<int>(Joystick::State::kUp)] = [&](const uint8_t, const Joystick::State)
+//	{
+//		COUNT++;
+//	};
+//	config.handlers[static_cast<int>(Joystick::State::kDown)] = [&](const uint8_t, const Joystick::State)
+//	{
+//
+//	};
+//	config.handlers[static_cast<int>(Joystick::State::kLeft)] = [&](const uint8_t, const Joystick::State)
+//	{
+//
+//	};
+//	config.handlers[static_cast<int>(Joystick::State::kRight)] = [&](const uint8_t, const Joystick::State)
+//	{
+//
+//	};
+//	config.handlers[static_cast<int>(Joystick::State::kSelect)] = [&](const uint8_t, const Joystick::State)
+//	{
+//
+//	};
+//	joystick = new Joystick(config);
 
 }
 
