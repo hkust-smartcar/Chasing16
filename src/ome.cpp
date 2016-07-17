@@ -134,7 +134,7 @@ int main(){
 	bool triangle_detector_1 = false, triangle_detector_2 = false, triangle_detector_3 = false;
 	bool triangle = false, reached_triangle = false;
 	int triangle_count_1 = 0, triangle_count_2 = 0, triangle_count_3 = 0;
-
+	bool sensorUpdated = false;
 
 	// configuration
 	Config_all();
@@ -180,6 +180,8 @@ int main(){
 	float encoder_count = 0.0f;
 	ChaseMethod Chase(ChaseMethod::Role::leader,0,1,&count);
 	Chase.update_Usensor();
+	ChaseMethod::Command leaderCommand = ChaseMethod::Command::error;
+	ChaseMethod::Command followerCommand = ChaseMethod::Command::error;
 	//	float area_f = 0.0f;
 	//	int nearest = 0, furthest = 0, left = 0, right = 0;
 	//	float run_f = 0.0f, area_f = 0.0f, nearest_f = 0.0f, furthest_f = 0.0f, left_f = 0.0f, right_f = 0.0f;
@@ -478,11 +480,52 @@ int main(){
 //				ispressed = false;
 //		}
 
-//		if(Chase.checkUSensor()){
-//			obj_distance = Chase.getFrontObjDistance();
-//			Chase.update_Usensor();
-//		}
-//		print_Count(obj_distance);
+		// check sensor reading, then whether control speed by distance or not
+		if(Chase.checkUSensor()){
+			obj_distance = Chase.getFrontObjDistance();
+			Chase.update_Usensor();
+			sensorUpdated = true;
+//			print_Count(obj_distance);
+		}
+		else sensorUpdated =false;
+
+		//check chasing command from other car
+		if(Chase.getCurrentRole() == ChaseMethod::Role::leader){
+			if(Runner.current_state == STATE::Triangle){
+				leaderCommand = ChaseMethod::Command::traingleForward;
+				Chase.sendCommand(leaderCommand);
+			}
+			else{
+				leaderCommand = ChaseMethod::Command::noAction;
+				Chase.sendCommand(leaderCommand);
+				}
+
+			switch(leaderCommand){
+			case(ChaseMethod::Command::traingleForward):
+				printvalue("traingleForward");
+			break;
+			case(ChaseMethod::Command::noAction):
+				printvalue("noAction");
+			break;
+			default:
+				printvalue("error");
+
+			}
+		}else if (Chase.getCurrentRole() == ChaseMethod::Role::follower){
+			followerCommand = Chase.getCommand();
+
+			switch(followerCommand){
+			case(ChaseMethod::Command::traingleForward):
+				printvalue("traingleForward");
+			break;
+			case(ChaseMethod::Command::noAction):
+				printvalue("noAction");
+			break;
+			default:
+				printvalue("error");
+			}
+		}
+
 
  //		x = int(++x)%4;
 //		Usensor_counter = int16_t(++Usensor_counter)%8;
